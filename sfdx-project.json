@@ -1,0 +1,24 @@
+{
+  "packageDirectories": [
+    {
+      "path": "force-app",
+      "default": true,
+      "package": "cs-dig-undrwrtr",
+      "versionName": "ver 0.1",
+      "versionNumber": "0.1.0.NEXT",
+      "versionDescription": "",
+      "dependencies": [ 
+   {
+      "subscriberPackageVersionId": "04tHn000001Vv4aIAC"
+   }
+   ]
+    }
+  ],
+  "name": "cognisure-fsc-ext",
+  "namespace": "csundrwrtr",
+  "sfdcLoginUrl": "https://login.salesforce.com",
+  "sourceApiVersion": "59.0",
+  "packageAliases": {
+    "cs-dig-undrwrtr": "0HoHr000000Kzx2KAC"
+  }
+}

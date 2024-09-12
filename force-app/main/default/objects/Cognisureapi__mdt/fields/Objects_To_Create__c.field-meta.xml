@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Objects_To_Create__c</fullName>
+    <description>CSV list of salesforce object API names to create. This field is used to debug the salesforce record creation one object after another. Run the transaction multiple times by adding objects to this list if you are running into an issue to debug and narrow down the root cause.</description>
+    <externalId>false</externalId>
+    <fieldManageability>SubscriberControlled</fieldManageability>
+    <inlineHelpText>CSV list of salesforce object API names to create</inlineHelpText>
+    <label>Objects To Create</label>
+    <length>32768</length>
+    <type>LongTextArea</type>
+    <visibleLines>3</visibleLines>
+</CustomField>

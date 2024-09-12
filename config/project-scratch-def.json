@@ -1,0 +1,41 @@
+{
+  "orgName": "Cognisure",
+  "edition": "Enterprise",
+  "hasSampleData": true,
+  "description": "test",
+  "release": "current",
+  "country": "US",
+  "language": "en_US",
+  "features": [
+    "EnableSetPasswordInApi",
+    "PersonAccounts",
+    "InsuranceClaimMgmt:5",
+    "InsurancePolicyAdmin:5",
+    "AuthorApex",
+    "FSCServiceProcess",
+    "LightningScheduler",
+    "ContactsToMultipleAccounts",
+    "FinancialServicesUser:5",
+    "FinancialServicesInsuranceUser"
+  ],
+  "settings": {
+    "lightningExperienceSettings": {
+      "enableS1DesktopEnabled": "true"
+    },
+    "mobileSettings": {
+      "enableS1EncryptedStoragePref2": "false"
+    },
+    "industriesSettings": {
+      "enableClaimMgmt": "true",
+      "enableManyToManyRelationships": "true",
+      "enableAccessToMasterListOfCoverageTypes": "true"
+    },
+    "accountSettings": {
+      "enableRelateContactToMultipleAccounts": true
+    }
+  }
+}
+
+
+
+    

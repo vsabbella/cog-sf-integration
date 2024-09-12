@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>api-details</label>
+    <protected>false</protected>
+    <values>
+        <field>Base_URL__c</field>
+        <value xsi:type="xsd:string">https://pcqa.cognisure.ai:1099</value>
+    </values>
+    <values>
+        <field>Common_JSON_URL__c</field>
+        <value xsi:type="xsd:string">/api/submission/commonjson/?id={0}</value>
+    </values>
+    <values>
+        <field>Email_Message_Query_Plugin__c</field>
+        <value xsi:type="xsd:string">CognisureAPI.MessageQueryBuilder</value>
+    </values>
+    <values>
+        <field>FSC_Object_Response_Map_Definiton__c</field>
+        <value xsi:type="xsd:string">cognisure_Sobject_Mapping</value>
+    </values>
+    <values>
+        <field>Field_Default_Definition__c</field>
+        <value xsi:type="xsd:string">cognisure_sffield_defaults</value>
+    </values>
+    <values>
+        <field>Field_External_Id_Definition__c</field>
+        <value xsi:type="xsd:string">cognisure_Sobject_External_Ids</value>
+    </values>
+    <values>
+        <field>Field_Mapping_Definition__c</field>
+        <value xsi:type="xsd:string">cognisurefieldmap</value>
+    </values>
+    <values>
+        <field>NamedCredentail__c</field>
+        <value xsi:type="xsd:string">cognisureai</value>
+    </values>
+    <values>
+        <field>Objects_To_Create__c</field>
+        <value xsi:type="xsd:string">Account,Claim,CustomerProperty,WorkerCompCoverageClass,CoverageType,InsurancePolicy</value>
+    </values>
+    <values>
+        <field>Password__c</field>
+        <value xsi:type="xsd:string">{!$Credential.Cognisure.password}</value>
+    </values>
+    <values>
+        <field>Record_Field_Setter_Plugin__c</field>
+        <value xsi:type="xsd:string">CognisureAPI.sobjectrecordsinterceptor</value>
+    </values>
+    <values>
+        <field>Submission_Id__c</field>
+        <value xsi:type="xsd:string">a00DS00000BywvGYAR</value>
+    </values>
+    <values>
+        <field>Submission_Query_Plugin__c</field>
+        <value xsi:type="xsd:string">CognisureAPI.SubmissionQueryBuilder</value>
+    </values>
+    <values>
+        <field>Token_Response_Key__c</field>
+        <value xsi:type="xsd:string">access_token</value>
+    </values>
+    <values>
+        <field>Token_URL__c</field>
+        <value xsi:type="xsd:string">/token</value>
+    </values>
+    <values>
+        <field>Upload_API_Endpoint__c</field>
+        <value xsi:type="xsd:string">/api/submission/upload?id={0}&amp;submissionName={1}&amp;X-Unique-Id={2}</value>
+    </values>
+    <values>
+        <field>Upload_API_Plugin__c</field>
+        <value xsi:type="xsd:string">CognisureAPI.EmailAttachmentForm64</value>
+    </values>
+    <values>
+        <field>Username__c</field>
+        <value xsi:type="xsd:string">{!$Credential.Cognisure.username}</value>
+    </values>
+</CustomMetadata>
