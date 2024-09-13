@@ -10,7 +10,7 @@ global class CognisureFileUploadMockImpl implements HttpCalloutMock {
         // Optionally, only send a mock response for a specific endpoint
         // and method.
         String reqendpointURL = req.getEndpoint().split('\\?')[0];//String.split(req.getEndpoint(),'?');
-        System.assertEquals('https://api.cognisure.ai/api/submission/upload', reqendpointURL);
+        System.assertEquals('https://pcqa.cognisure.ai:1099/api/submission/upload', reqendpointURL);
         System.assertEquals('POST', req.getMethod());
 
         // Create a fake response

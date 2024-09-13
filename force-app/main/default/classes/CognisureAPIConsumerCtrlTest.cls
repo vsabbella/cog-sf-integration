@@ -168,7 +168,7 @@ private with sharing class CognisureAPIConsumerCtrlTest {
     private static void createEmailMessage(String caseId) {
         EmailMessage emailMessage = new EmailMessage();
         emailMessage.status = '3'; // email was sent
-        emailMessage.relatedToId = caseId;
+        emailMessage.ParentId = caseId;
         emailMessage.fromAddress = 'billing@acme.com'; // from address
         emailMessage.fromName = 'Billing Department'; // from name
         emailMessage.toAddress = 'johnSmith@example.com';
@@ -201,7 +201,7 @@ private with sharing class CognisureAPIConsumerCtrlTest {
                 '    "ContactPhone": null,\n' +
                 '    "Description": "Attaching both the documents\\n\\nThank you,\\nVenkata.",\n' +
                 '    "FinServ__FinancialAccount__c": null,\n' +
-                '    "FinServ__Household__c": null,\n' +
+                // '    "FinServ__Household__c": null,\n' +
                 //'    "Id": "500Hp00001fQeMTIA0",\n' +
                 '    "IsClosed": false,\n' +
                 '    "IsDeleted": false,\n' +
@@ -239,7 +239,7 @@ private with sharing class CognisureAPIConsumerCtrlTest {
     private static Sobject getMetadata() {
         String metadataJSON = '[\n' +
                 '  {\n' +
-                '    "Base_URL__c": "https://api.cognisure.ai",\n' +
+                '    "Base_URL__c": "https://pcqa.cognisure.ai:1099",\n' +
                 '    "DeveloperName": "api_details",\n' +
                 //'    "Id": "m0PHp0000004mUPMAY",\n' +
                 '    "Label": "api-details",\n' +
@@ -282,3 +282,4 @@ private with sharing class CognisureAPIConsumerCtrlTest {
 
 
 }
+

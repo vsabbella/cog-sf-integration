@@ -1,4 +1,4 @@
-Global without sharing class CognisureAPI {
+Global with sharing class CognisureAPI {
 
     public class CognisureAPIException extends Exception{}
     
@@ -123,7 +123,7 @@ Global without sharing class CognisureAPI {
             }
         }
     }
-    //CognisureAPI.invokeLoadFromStaticResource('');
+    //csundrwrtr.CognisureAPI.invokeLoadFromStaticResource('');
     //CognisureAPI.invokeLoadFromStaticResource('a1yHp0000090wZNIAY');
     global static void invokeLoadFromStaticResource(String SubmissionId){
         StaticResource SR = [Select id,name,body from StaticResource where Name = 'submissionrespunformatted'];//cognisureapimetadata.get

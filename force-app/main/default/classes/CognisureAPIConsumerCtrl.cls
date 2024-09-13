@@ -20,8 +20,9 @@ public with sharing class CognisureAPIConsumerCtrl {
             if (cognisureapimetadata == null) {
                 cognisureapimetadata = (Sobject) Cognisureapi__mdt.getInstance('api_details');
                 if (test.isRunningTest()) {
-                    cognisureapimetadata = getMetadata();
+                    //cognisureapimetadata = getMetadata();
                 }
+                System.debug(LoggingLevel.DEBUG, JSON.serialize(cognisureapimetadata));
             }
             return cognisureapimetadata;
         }
