@@ -125,7 +125,7 @@ private with sharing class CognisureAPIConsumerCtrlTest {
         System.assert(Claims.size()>0, 'Claims Not created');
         System.Debug(LoggingLevel.DEBUG,'Claims:'+JSON.serialize(Claims));
 
-        List<CustomerProperty> CustomerProperties = [Select Id,PrimaryOwnerId,RecordTypeId,FloorType,FoundationType,GarageType,
+        List<CustomerProperty> CustomerProperties = [Select Id,PrimaryOwnerId,FloorType,FoundationType,GarageType,
                 LotArea,CeilingType,DwellingType,PurchasePrice,RoofType,BedroomCount,BuiltUpArea,EngineDisplacementVolume,FairMarketValue,FloorCount,IsBasementIncluded,
                 IsChimneyIncluded,IsPassedSmogCheck,IsSwimmingPoolIncluded,PurchaseDate,YearBuilt
         from CustomerProperty where createdDate = Today];
@@ -149,6 +149,7 @@ private with sharing class CognisureAPIConsumerCtrlTest {
     private static testMethod void test_Misc(){
         CognisureAPIRequestsTest.getCommonJSONAPIResponse();
         CognisureAPIRequestsTest.getCommonjsonAPIResp2();
+        CognisureAPI.schedulebatchjobs();
     }
 
     @TestSetup

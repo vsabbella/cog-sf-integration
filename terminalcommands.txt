@@ -1,1 +1,0 @@
-sf package version create --package "cs-dig-undrwrtr" --wait 30 --installation-key-bypass --code-coverage --definition-file config/project-scratch-def.json --target-dev-hub "cognisure partner"

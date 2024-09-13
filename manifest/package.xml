@@ -104,5 +104,9 @@
         <members>submissionrespunformatted</members>
         <name>StaticResource</name>
     </types>
+    <types>
+        <members>Submission_Record_Page</members>
+        <name>flexipage</name>
+    </types>
     <version>59.0</version>
 </Package>

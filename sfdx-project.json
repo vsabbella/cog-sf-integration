@@ -7,11 +7,11 @@
       "versionName": "ver 0.1",
       "versionNumber": "0.1.0.NEXT",
       "versionDescription": "",
-      "dependencies": [ 
-   {
-      "subscriberPackageVersionId": "04tHn000001Vv4aIAC"
-   }
-   ]
+      "dependencies": [
+        {
+          "subscriberPackageVersionId": "04tHn000001Vv4aIAC"
+        }
+      ]
     }
   ],
   "name": "cognisure-fsc-ext",
@@ -19,6 +19,8 @@
   "sfdcLoginUrl": "https://login.salesforce.com",
   "sourceApiVersion": "59.0",
   "packageAliases": {
-    "cs-dig-undrwrtr": "0HoHr000000Kzx2KAC"
+    "cs-dig-undrwrtr": "0HoHr000000Kzx2KAC",
+    "cs-dig-undrwrtr@0.1.0-1": "04tHr0000013If8IAE",
+    "cs-dig-undrwrtr@0.1.0-2": "04tHr0000013IfDIAU"
   }
 }

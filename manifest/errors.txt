@@ -1,5 +1,0 @@
-Error (1): Multiple errors occurred: 
-(1) Apex Test Failure: Class.csundrwrtr.CognisureAPIConsumerCtrl.makeUploadRequestdo: line 129, column 1
-Class.csundrwrtr.CognisureAPIConsumerCtrlTest.TestUploadPIRequests: line 13, column 1 csundrwrtr.CognisureAPIConsumerCtrl.CognisureAPIConsumerCtrlException: Invalid Token:null
-(2) Apex Test Failure: Class.csundrwrtr.CSFileUploadAPIConsumerBatch.execute: line 39, column 1 csundrwrtr.CSFileUploadAPIConsumerBatch.CSFileUploadAPIException: Error OccuredClass.csundrwrtr.CognisureAPIConsumerCtrl.makeUploadRequestdo: line 129, column 1
-Class.csundrwrtr.CSFileUploadAPIConsumerBatch.execute: line 26, column 1Invalid Token:null

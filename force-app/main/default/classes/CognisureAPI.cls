@@ -151,6 +151,15 @@ Global with sharing class CognisureAPI {
         ProcessSubmissionResponse.processJSONResponse(submissionResponseJson,submissionId0);
     }
 
+    global static void schedulebatchjobs(){
+        CSFileUploadAPIConsumerBatch csfileupload = new CSFileUploadAPIConsumerBatch();
+        database.executebatch(csfileupload,1);
+
+
+        cssubmissionbatch b = new cssubmissionbatch();
+        database.executeBatch(b,1);
+    }
+
 
     /*public class LightningFileForm64Builder implements IBase64Handler{
 
