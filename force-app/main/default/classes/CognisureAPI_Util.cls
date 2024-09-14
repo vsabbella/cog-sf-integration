@@ -2,6 +2,35 @@
  * Author : vsabbella
  */
 public with sharing class CognisureAPI_Util {
+    //System.debug(CognisureAPI_Util.getNamespacePrefix());
+    public static string NameSpacePrefix{
+        get{
+            if(NameSpacePrefix==null){
+                NameSpacePrefix=getNamespacePrefix();
+            }
+            return NameSpacePrefix;
+        }
+        private set;
+       
+    }
+    private static String getNamespacePrefix() {
+        Integer indexOfToken = -1;
+        String namespace = '';
+        for ( Schema.SObjectType type : Schema.getGlobalDescribe().values() ) {
+            String sobjName = String.valueOf(type);
+    
+            if (null != sobjName) {
+                indexOfToken = sobjName.indexOf('Cognisureapi');
+            }
+    
+            if (indexOfToken != -1) {
+                namespace = sobjName.substring(0, indexOfToken);
+                break;
+            }
+        }
+    
+        return namespace;
+    }
 
     public Static String getSubmissionId(){
         System.debug(LoggingLevel.DEBUG,'Submission Id from metadata'+(String)cognisureapimetadata.get('Submission_Id__c'));

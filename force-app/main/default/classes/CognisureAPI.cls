@@ -150,7 +150,7 @@ Global with sharing class CognisureAPI {
 
         ProcessSubmissionResponse.processJSONResponse(submissionResponseJson,submissionId0);
     }
-
+    //CognisureAPI.schedulebatchjobs();
     global static void schedulebatchjobs(){
         CSFileUploadAPIConsumerBatch csfileupload = new CSFileUploadAPIConsumerBatch();
         database.executebatch(csfileupload,1);
