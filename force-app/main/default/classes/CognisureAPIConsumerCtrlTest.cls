@@ -110,7 +110,7 @@ private with sharing class CognisureAPIConsumerCtrlTest {
         Test.startTest();
         CognisureAPI.invokeLoadFromStaticResource(SubmisisonId);
         try{
-            //CognisureAPI.invokeLoadFromStaticResource(SubmisisonId);
+            //CognisureAPI.invokeLoadFromStaticResource('a00DS00000Bz1m6YAB');
         }
         catch(Exception Ex){
 
@@ -277,9 +277,24 @@ private with sharing class CognisureAPIConsumerCtrlTest {
         List<Sobject> SubmissionJSONList = (List<Submission__c>) JSON.deserialize(SubmssionJSON, List<Submission__c>.class);
         return SubmissionJSONList;
     }
+    
+    private static testmethod void testCustomSettingMapping(){
+        Id submissionId = [Select id,name from Submission__c limit 1].Id;
+        System.assert(submissionId!=null,'Submission Id is null');
+        string jsonresp = CognisureAPIRequestsTest.getCommonJSONAPIResponse();
+        ProcessSubmissionResponse_mdt.processJSONResponse('',submissionId);
+        ProcessSubmissionResponse.processJSONResponse(jsonresp,submissionId);
+        Account a = [Select id,name from account where CreatedDate=Today limit 1];
+        System.assert(a!=null,'Account not created');
+        List<Claim> claimsList = [Select id,name from Claim where createdDate = Today];
+        System.assert(claimsList.size()>0,'Claims not created..');
+    }
 
-
-
+    private static void testInsertClaimRecords(){
+        String claimJson = '[{"attributes":{"type":"Claim"},"Name":"Test0", "IsDrivable":"false", "Status":"Initial", "AccountId":"001DS00001M3osoYAB", "CaseId":"500DS00000FURuNYAX"}]';
+        List<Claim> cliams = (List<Claim>)JSON.deserialize(claimJson,List<Claim>.class);
+        Insert cliams;
+    }
 
 }
 
