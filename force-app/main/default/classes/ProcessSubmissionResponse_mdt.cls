@@ -67,8 +67,7 @@ public with sharing class ProcessSubmissionResponse_mdt {
     }
     /*
     Delete [Select id,name from Claim where createdDate = Today]
-        ProcessSubmissionResponse_mdt.processJSONResponse('','a00DS00000Bz1m6YAB');
-    */
+     */
     public static void processJSONResponse(String JSONRepsonse, Id submissionSobjId){
         
         Map<String,Id> parentSobjectIds = new Map<String,Id>(); 
