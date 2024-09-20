@@ -31,6 +31,10 @@
         <value xsi:type="xsd:string">cognisurefieldmap</value>
     </values>
     <values>
+        <field>File_Content_Plugin__c</field>
+        <value xsi:type="xsd:string">CognisureAPI.AttachmentQuery</value>
+    </values>
+    <values>
         <field>NamedCredentail__c</field>
         <value xsi:type="xsd:string">cognisureai</value>
     </values>
@@ -65,10 +69,6 @@
     <values>
         <field>Upload_API_Endpoint__c</field>
         <value xsi:type="xsd:string">/api/submission/upload?id={0}&amp;submissionName={1}&amp;X-Unique-Id={2}</value>
-    </values>
-    <values>
-        <field>Upload_API_Plugin__c</field>
-        <value xsi:type="xsd:string">CognisureAPI.EmailAttachmentForm64</value>
     </values>
     <values>
         <field>Username__c</field>

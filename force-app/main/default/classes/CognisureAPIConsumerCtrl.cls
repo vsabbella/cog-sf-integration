@@ -20,7 +20,6 @@ public with sharing class CognisureAPIConsumerCtrl {
             if (cognisureapimetadata == null) {
                 cognisureapimetadata = (Sobject) Cognisureapi__mdt.getInstance('api_details');
                 if (test.isRunningTest()) {
-                    //cognisureapimetadata = getMetadata();
                 }
                 System.debug(LoggingLevel.DEBUG, JSON.serialize(cognisureapimetadata));
             }
@@ -135,8 +134,12 @@ public with sharing class CognisureAPIConsumerCtrl {
                 String form64 = '';
                 //form64+= getBase64StringFromAttachments(caseId);
                 //form64+= getBase64StringFromAttachmentsUsingImpl(caseId);
-                CognisureAPI.IBase64Handler ibase64impl = (CognisureAPI.IBase64Handler) Type.forName(this.uploadapiimplementation).newInstance();
-                form64 += ibase64impl.getBase64String(caseId);
+                //CognisureAPI.IBase64Handler ibase64impl = (CognisureAPI.IBase64Handler) Type.forName(this.uploadapiimplementation).newInstance();
+                String contentPlugin = (String) cognisureapimetadata.get('File_Content_Plugin__c');
+                String fileQueryClass = string.isBlank(contentPlugin)?'CognisureAPI.AttachmentQuery':contentPlugin;
+                CognisureAPI.IFileContentQueryHander fileQueryHandler = (CognisureAPI.IFileContentQueryHander)Type.forName(fileQueryClass).newInstance();
+                String fileQueryString = fileQueryHandler.getFileContentQuery(caseId);
+                form64 += CognisureAPI_Util.getBase64String(caseId,fileQueryString);
 
                 string contentType = vNHttpFormBuilder.GetContentType();
 
@@ -184,66 +187,14 @@ public with sharing class CognisureAPIConsumerCtrl {
 
     }
 
-    /*private String getBase64StringFromAttachmentsUsingImpl(Id caseId){
-        String form64 = '';
-        CognisureAPI.IBase64Handler ibase64impl = (CognisureAPI.IBase64Handler) Type.forName(this.uploadapiimplementation).newInstance();
-        form64+= ibase64impl.getBase64String(caseId);
-
-        return form64;
-    }*/
-
-    /*private String getBase64StringFromAttachments(String caseId){
-        String form64 = '';
-        blob blobcontent;
-        vNHttpFormBuilder.WriteFileResult result;
-
-        for(Attachment att: [SELECT id,name,body FROM Attachment WHERE ParentId IN (SELECT Id FROM EmailMessage WHERE ParentId = :caseId)]){
-            String file64Encoded = EncodingUtil.base64Encode(att.body);//string
-            blobcontent = EncodingUtil.base64Decode(file64Encoded);
-
-            form64 += vNHttpFormBuilder.WriteBoundary();
-            System.Debug(LoggingLevel.Debug,'first line');
-            System.Debug(LoggingLevel.Debug,form64);
-            form64 += vNHttpFormBuilder.WriteBodyParameter('file', att.name+'.pdf');
-            System.Debug(LoggingLevel.Debug,'after parameter');
-            System.Debug(LoggingLevel.Debug,form64);
-            form64 += vNHttpFormBuilder.WriteBoundary();
-
-            result = vNHttpFormBuilder.WriteFile('file', att.name+'.pdf', 'application/octet-stream', blobcontent);
-            form64 += result.Content;
-        }
-
-        form64 += vNHttpFormBuilder.WriteBoundary(result.EndingType);
-        return form64;
-    }*/
-
-    /*private string getQueryParamsforUploadAPI(String caseId) {
-        //String url0 = endpoint;
-        Map<String, String> urlParameters = new Map<String, String>{'id'=>'','submissionName'=>'case#'+caseId};
-        String urlparameterString='';
-        for(string param:urlParameters.keySet()){
-            urlparameterString+=param+'='+urlParameters.get(param)+'&';
-        }
-        //remove last '&'
-        urlparameterString = urlparameterString.substringBeforeLast('&');
-        if(urlparameterString.length()>0){
-            urlparameterString='?'+urlparameterString;
-        }
-
-        //callout:cognisureai
-        //req.setEndpoint('callout:'+namedCred++urlparameterString);
-        return urlparameterString;
-    }*/
     public String getCommonJSONforSubmission( String submissionId) {
 
         if (test.isRunningTest())
             Test.setMock(HttpCalloutMock.class, new CognisureAuthTokenMockImpl());
         String ctoken = this.ctoken;
-        //String commonJSONEndpoint = 'https://api.cognisure.ai/api/submission/commonjson/?id=' + submissionId;
         String commonJSONEndpoint = this.baseurl+this.commonjsonapiurl;
         commonJSONEndpoint = String.format(commonJSONEndpoint,new List<String>{submissionId});
 
-        //  Compose the http request
         HttpRequest httpRequest = new HttpRequest();
 
         httpRequest.setHeader('Authorization', 'Bearer ' + ctoken);

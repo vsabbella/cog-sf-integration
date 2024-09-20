@@ -16,7 +16,7 @@
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>Upload_API_Plugin__c</field>
+                <field>File_Content_Plugin__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>

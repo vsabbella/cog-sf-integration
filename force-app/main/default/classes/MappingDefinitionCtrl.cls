@@ -11,26 +11,11 @@ public with sharing class MappingDefinitionCtrl {
                 '        "IsDrivable":false,\n' +
                 '        "Status":"Initial"\n' +
                 '    },\n' +
+                '    "Account" : {\n' +
+                '        "Name":"Cognisure Default Account" \n' +
+                '    },\n' +
                 '    "CustomerProperty" : {\n' +
-               // '        "BedroomCount": 3,\n' +
                 '        "BuiltUpArea": "1000",\n' +
-                //'        "CeilingType": "Conventional",\n' +
-                //'        "DwellingType": "Duplex",\n' +
-                //'        "EngineDisplacementVolume": null,\n' +
-                //'        "FairMarketValue": 100000,\n' +
-                //'        "FloorCount": 2,\n' +
-                //'        "FloorType": "Ceramic Tile",\n' +
-                //'        "FoundationType": "Basement",\n' +
-                //'        "GarageType": "Attached",\n' +
-                //'        "IsBasementIncluded": false,\n' +
-                //'        "IsChimneyIncluded": false,\n' +
-                //'        "IsPassedSmogCheck": false,\n' +
-                //'        "IsSwimmingPoolIncluded": false,\n' +
-                //'        "LotArea": "2000",\n' +
-                //'        "PurchaseDate": "01/07/2024",\n' +
-                //'        "PurchasePrice": 100000,\n' +
-                //'        "RecordTypeId": "012Hp000002F7C0IAK",\n' +
-                //'        "RoofType": "Slate",\n' +
                 '        "YearBuilt": 2000\n' +
                 '    },\n' +
                 '    \n' +
@@ -235,7 +220,7 @@ public with sharing class MappingDefinitionCtrl {
     private static String cognisure_Sobject_External_Ids(){
 
         String jsonStr = '{\n' +
-                '    "Claim" : "Name",\n' +
+                '    "Claim" : "",\n' +
                 '    "CustomerProperty" : "",\n' +
                 '    "WorkerCompCoverageClass" : "",\n' +
                 '    "CoverageType" : "",\n' +
@@ -281,10 +266,11 @@ public with sharing class MappingDefinitionCtrl {
 
     public static void getStaticResourceData() {
 
-        get_cognisure_sffield_defaults_sr();
-        get_cognisurefieldmap_sr();
-        get_cognisure_Sobject_Mapping_sr();
-        get_cognisure_Sobject_External_Ids_sr();
+        //get_cognisure_sffield_defaults_sr();
+        //get_cognisurefieldmap_sr();
+        //get_cognisure_Sobject_Mapping_sr();
+        //get_cognisure_Sobject_External_Ids_sr();
+
     }
 
 

@@ -1,9 +1,44 @@
+/**
+ * 
+ * 
+ String NAMESPACEPREFIX= 'csundrwrtr__';
+ String caseFieldAPI = NAMESPACEPREFIX+'case__c';
+ Submission__c s = [select Id,csundrwrtr__Case__c from Submission__c limit 1];
+Schema.DescribeSObjectResult[] descResult = Schema.describeSObjects(new List<String>{'Submission__c'});
+Schema.DescribeSObjectResult descResult0 = descResult[0];
+System.debug(LoggingLevel.Debug, descResult0.fields.getMap().get(caseFieldAPI));
+Schema.SobjectField fieldToken_case = descResult0.fields.getMap().get(caseFieldAPI);
+System.debug((String)s.get(fieldToken_case));
+
+Schema.DescribeSObjectResult dsr = Cognisureapi__mdt.sObjectType.getDescribe();
+String namespacePrefix = dsr.getName().remove(dsr.getLocalName());
+System.debug(namespacePrefix);
+
+
+
+ */
+
+
 public with sharing class ProcessSubmissionResponse {
     Class CustomResponseException Extends Exception{}
-    //Public static Final String NAMESPACEPREFIX=CognisureAPI_Util.NameSpacePrefix;
+    //Static String NAMESPACEPREFIX=CognisureAPI_Util.NAMESPACEPREFIX;
+    
     public ProcessSubmissionResponse() {
         
     }
+
+    /*public static String NAMESPACEPREFIX{
+        get{
+            if(NAMESPACEPREFIX==null){
+                Schema.DescribeSObjectResult dsr = Cognisureapi__mdt.sObjectType.getDescribe();
+                String namespacePrefix0 = dsr.getName().remove(dsr.getLocalName());
+                System.debug(LoggingLevel.DEBUG, namespacePrefix0);
+                
+            }
+            return NAMESPACEPREFIX;
+        }
+        private set;
+    }*/
     
     private static sobject cognisureapimetadata {
         get {
@@ -50,41 +85,75 @@ public with sharing class ProcessSubmissionResponse {
     } 
     
     public static Map<String,List<Common_JSON_Mapping_Setting__mdt>> getResponseMapping(){
+        Schema.DescribeSObjectResult[] descResult = Schema.describeSObjects(new List<String>{'Common_JSON_Mapping_Setting__mdt'});
         Map<String,List<Common_JSON_Mapping_Setting__mdt>> mappingRecordsIndexBy_Seq = new Map<String,List<Common_JSON_Mapping_Setting__mdt>>();
-        for(Common_JSON_Mapping_Setting__mdt responseMappingmdt: Common_JSON_Mapping_Setting__mdt.getAll().Values()){
-            //[Select Id, csundrwrtr__Active__c, csundrwrtr__Order__c, csundrwrtr__Sobject__c, csundrwrtr__Field__c, csundrwrtr__ResponseFieldKey__c, csundrwrtr__ResponseObjectKey__c,csundrwrtr__Default_Value__c from csundrwrtr__Common_JSON_Mapping_Setting__mdt
-             //where csundrwrtr__Active__c =true order by csundrwrtr__Order__c Asc]
-                Decimal mappingSequenceDecimal = (Decimal)responseMappingmdt.get('Order__c');
-                String mappingSequence = String.valueOf(mappingSequenceDecimal);
-                if(!mappingRecordsIndexBy_Seq.containsKey(mappingSequence)){
-                    mappingRecordsIndexBy_Seq.put(mappingSequence, new List<Common_JSON_Mapping_Setting__mdt>());
+                if(descResult[0].isAccessible() && descResult[0].isQueryable()){
+                    for(Common_JSON_Mapping_Setting__mdt responseMappingmdt: Common_JSON_Mapping_Setting__mdt.getAll().Values()){
+                        //[Select Id, csundrwrtr__Active__c, csundrwrtr__Order__c, csundrwrtr__Sobject__c, csundrwrtr__Field__c, csundrwrtr__ResponseFieldKey__c, csundrwrtr__ResponseObjectKey__c,csundrwrtr__Default_Value__c from csundrwrtr__Common_JSON_Mapping_Setting__mdt
+                         //where csundrwrtr__Active__c =true order by csundrwrtr__Order__c Asc]
+                            Boolean isActive = (Boolean)responseMappingmdt.get('Active__c');
+                            if(isActive){
+                                Decimal mappingSequenceDecimal = (Decimal)responseMappingmdt.get('Order__c');
+                                String mappingSequence = String.valueOf(mappingSequenceDecimal);
+                                if(!mappingRecordsIndexBy_Seq.containsKey(mappingSequence)){
+                                    mappingRecordsIndexBy_Seq.put(mappingSequence, new List<Common_JSON_Mapping_Setting__mdt>());
+                                }
+                                mappingRecordsIndexBy_Seq.get(mappingSequence).add(responseMappingmdt);
+                            }
+                    }
                 }
-                mappingRecordsIndexBy_Seq.get(mappingSequence).add(responseMappingmdt);
-            
-        }
+                else {
+                    Throw New CustomResponseException('Mapping Data is Not accessible');
+                }
+        
         //System.debug(LoggingLevel.DEBUG,JSON.serialize(mappingRecordsIndexBy_RespObjects));
         return mappingRecordsIndexBy_Seq;
     }
     /*
     Delete [Select id,name from Claim where createdDate = Today]
-        ProcessSubmissionResponse_mdt.processJSONResponse('','a00DS00000Bz1m6YAB');
+        ProcessSubmissionResponse.processJSONResponse('','a00DS00000Bz1m6YAB');
     */
     public static void processJSONResponse(String JSONRepsonse, Id submissionSobjId){
         
         Map<String,Id> parentSobjectIds = new Map<String,Id>(); 
-        
-        Submission__c SubsmsisonSobjRecord = [Select Id,name,case__c from Submission__c where Id =:submissionSobjId];
-        Id caseId = SubsmsisonSobjRecord?.case__c;
-        if(!String.isBlank(caseId)){
-            parentSobjectIds.put('caseid',caseId);
+
+        Schema.DescribeSObjectResult[] descResult_submission = Schema.describeSObjects(new List<String>{'Submission__c'});
+        Schema.DescribeSObjectResult descRes = descResult_submission[0].getSObjectType().getDescribe();
+        String namespacePrefix0 = descRes.getName().remove(descRes.getLocalName());
+
+        Sobject SubsmsisonSobjRecord ;
+        if(descResult_submission[0].isAccessible() && descResult_submission[0].isQueryable()){
+            String caseFieldAPI = namespacePrefix0+'Case__c';
+            System.debug(LoggingLevel.DEBUG, caseFieldAPI);
+            SubsmsisonSobjRecord = [Select Id,case__c from Submission__c where Id =:submissionSobjId];
+            Schema.SobjectField fieldToken_case = descRes.fields.getMap().get(caseFieldAPI);
+            //System.debug(LoggingLevel.DEBUG, descRes.fields.getMap());
+            System.debug( fieldToken_case);
+
+            Schema.DescribeFieldResult dfr_case = fieldToken_case.getDescribe();
+            if(dfr_case.accessible ){
+                Id caseId = SubsmsisonSobjRecord.get(caseFieldAPI)!=null?String.valueOf(SubsmsisonSobjRecord.get(caseFieldAPI)):'';
+                if(!String.isBlank(caseId)){
+                    parentSobjectIds.put('caseid',caseId);
+                }
+            }
+            else{
+                Throw New CustomResponseException('Case field on Submission Object is Not Accessible. Check permissions');
+            }
+            
         }
+        else{
+            Throw New CustomResponseException('Submission record is not accessible. Check permissions on Submission Object.');
+        }
+        
+        
         //System.debug(LoggingLevel.debug, '-->'+submissionResponseJson);
         
         //Map<String,String> SobjectMapping = getSobjectMapping();
         //comes from static resouce mapping: CustomeObject => Response Element
-        StaticResource SR = [Select id,name,body from StaticResource where Name = 'submissionrespunformatted'];
-        String submissionResponseJson =  EncodingUtil.base64Decode(EncodingUtil.base64Encode(sr.body)).toString();
-        //String submissionResponseJson =  JSONRepsonse;
+        //StaticResource SR = [Select id,name,body from StaticResource where Name = 'submissionrespunformatted'];
+        //String submissionResponseJson =  EncodingUtil.base64Decode(EncodingUtil.base64Encode(sr.body)).toString();
+        String submissionResponseJson =  JSONRepsonse;
         Map<String, Object> m = (Map<String, Object>)JSON.deserializeUntyped(submissionResponseJson);
         String dataJson = (String)m.get('data');
         Map<String, Object> m1 = (Map<String, Object>)JSON.deserializeUntyped(dataJson);
@@ -144,7 +213,8 @@ public with sharing class ProcessSubmissionResponse {
             parentSobjectIds.put('accountid',accountList[0].Id);
         }
         else{
-            if(accountList.size()>0){
+            if(accountList.size()==0){
+                accountList = SobjectsRecords_BySobjectString.get(SobjectTypeString_Account);
                 List<Id> Ids = upsertOrInsertSFRecords(accountList,'Account',descResMap.get(SobjectTypeString_Account));
                 parentSobjectIds.put('accountid',Ids[0]);
             }
@@ -222,43 +292,53 @@ public with sharing class ProcessSubmissionResponse {
     public static List<Id> upsertOrInsertSFRecords(List<Sobject> sobjList, String sobjectTypeStr, Schema.DescribeSObjectResult descRes){
         List<Id> Ids;
         Map<String,String> sobjectExternalIdInfo = getSobjectExternalIdInfo();
+       
         if(sobjectExternalIdInfo.containsKey(sobjectTypeStr) && !String.isBlank(sobjectExternalIdInfo.get(sobjectTypeStr))){
+            
+            
+          if( descRes.isAccessible() && (descRes.isCreateable() || descRes.isUpdateable())){
             //System.debug(LoggingLevel.Debug,'@@@'+descResMap.get(sobjectTypeStr).Fields.getMap().get('Cognisure_External_Id__c'));
             String externalIdToken = sobjectExternalIdInfo.get(sobjectTypeStr);
             Schema.SObjectField fieldToken2 = descRes.Fields.getMap().get(externalIdToken);
             Database.UpsertResult[] results ;
             if(fieldToken2!=null){
-                //results = database.Upsert(sobjList1,fieldToken); 
-                //System.debug(LoggingLevel.Debug, '-->claims'+results.size());
-                //System.debug(LoggingLevel.Debug, '-->claims'+results);
-                System.debug(LoggingLevel.DEBUG, 'Before Upserting Records:'+sobjectTypeStr);
-                //Ids=upsertRecords(sobjList,fieldToken2);
+                //System.debug(LoggingLevel.DEBUG, 'Before Upserting Records:'+sobjectTypeStr);
                 results = Database.upsert(sobjList,fieldToken2);
-                System.debug(LoggingLevel.ERROR, JSON.serialize(results));
+                //System.debug(LoggingLevel.ERROR, JSON.serialize(results));
             }
             // Not supporting upserts yet as there are not external Ids.
             //Upsert claims Name;
+         }
+         else {
+            Throw New CustomResponseException('Check Permissions on Object '+sobjectTypeStr);
+         }
         }
         else {
             //System.debug(LoggingLevel.DEBUG, 'Before Inserting Records'+sobjectTypeStr);
             Ids = new List<Id>();
-            Database.SaveResult[] srList = Database.insert(sobjList, false);
-            for(Database.SaveResult sr:srList ){
-                if (sr.isSuccess()) {
-                    // Operation was successful, so get the ID of the record that was processed
-                    System.debug('Successfully inserted Record. Record ID: ' + sr.getId());
-                    Ids.add(sr.getId());
-                }
-                else {
-                    // Operation failed, so get all errors                
-                    for(Database.Error err : sr.getErrors()) {
-                        System.debug('The following error has occurred.');                    
-                        System.debug(err.getStatusCode() + ': ' + err.getMessage());
-                        System.debug('Record fields that affected this error: ' + err.getFields());
-                        Throw New CustomResponseException('Error Occured'+err.getStatusCode() + ': ' + err.getMessage()+':'+err.getFields());
+            if( descRes.isAccessible() && descRes.isCreateable()){
+                Database.SaveResult[] srList = Database.insert(sobjList, false);
+                for(Database.SaveResult sr:srList ){
+                    if (sr.isSuccess()) {
+                        // Operation was successful, so get the ID of the record that was processed
+                        System.debug('Successfully inserted Record. Record ID: ' + sr.getId());
+                        Ids.add(sr.getId());
+                    }
+                    else {
+                        // Operation failed, so get all errors                
+                        for(Database.Error err : sr.getErrors()) {
+                            System.debug('The following error has occurred.');                    
+                            System.debug(err.getStatusCode() + ': ' + err.getMessage());
+                            System.debug('Record fields that affected this error: ' + err.getFields());
+                            Throw New CustomResponseException('Error Occured:'+err.getStatusCode() + ': ' + err.getMessage()+':'+err.getFields()+':Sobject : '+sobjectTypeStr);
+                        }
                     }
                 }
             }
+            else{
+                Throw New CustomResponseException('Check Permissions on Object '+sobjectTypeStr);
+            }
+            
         }
         
         return Ids;
@@ -336,34 +416,40 @@ public with sharing class ProcessSubmissionResponse {
         Map<String,Object> DefaultfieldMapByObject = (Map<String, Object>)JSON.deserializeUntyped(DefaultfieldMapStr);
         Map<String,Object> DefaultsMap_Sobject = (Map<String,Object>)DefaultfieldMapByObject.get(Sobjectname);
         
-        
-        if(DefaultsMap_Sobject!=null){
-            for(Sobject sobj:sobjList){
-                String Sobjname = sobj.getSObjectType().toString();
-                if(Sobjname==Sobjectname){
-                    for(String Str : DefaultsMap_Sobject.keySet()){
-                        if(!Sobj.isSet(Str)    ) {
-                            Schema.SobjectField fieldToken = descSobjRes.fields.getMap().get(Str);
-                            Schema.DescribeFieldResult dfr = fieldToken.getDescribe();
-                            Object o = (Object)DefaultsMap_Sobject.get(Str);
-                            System.debug(LoggingLevel.Debug, 'fieldName: '+dfr.getName()+': Type: '+dfr.getSoapType());
-                            o=convertFieldValueToObject(dfr.getName(), o,String.valueOf(dfr.getSoapType()));
-                            System.debug(LoggingLevel.Debug, ''+o);
-                            sobj.put(Str,o);
+        if(descSobjRes.isAccessible() && descSobjRes.isCreateable()){
+            if(DefaultsMap_Sobject!=null){
+                for(Sobject sobj:sobjList){
+                    String Sobjname = sobj.getSObjectType().toString();
+                    if(Sobjname==Sobjectname){
+                        for(String Str : DefaultsMap_Sobject.keySet()){
+                                Schema.SobjectField fieldToken = descSobjRes.fields.getMap().get(Str);
+                                Schema.DescribeFieldResult dfr = fieldToken.getDescribe();
+                                if(dfr.isAccessible() && dfr.isUpdateable()){
+                                    if(!Sobj.isSet(Str)    ) {
+                                
+                                        Object o = (Object)DefaultsMap_Sobject.get(Str);
+                                        System.debug(LoggingLevel.Debug, 'fieldName: '+dfr.getName()+': Type: '+dfr.getSoapType());
+                                        o=convertFieldValueToObject(dfr.getName(), o,String.valueOf(dfr.getSoapType()));
+                                        System.debug(LoggingLevel.Debug, ''+o);
+                                        sobj.put(Str,o);
+                                    
+                                    }
+                                }
+                            
+                            
                         }
-                        
                     }
+                    
                 }
                 
             }
-            
         }
+        
         
         
     }
     
     public static Sobject populateSobjectWithFieldValues(Map<String,Schema.DescribeSObjectResult> descSobjResMap, Object resp_obj,  List<Common_JSON_Mapping_Setting__mdt> mappingList){
-        //System.debug(LoggingLevel.Debug, 'SobjectType:'+sobj.getSObjectType()); 
         Map<String,Object> res_obj_field_values = (Map<String,Object>)resp_obj;
 
         Common_JSON_Mapping_Setting__mdt mapping0 = mappingList[0];
@@ -376,27 +462,31 @@ public with sharing class ProcessSubmissionResponse {
         Sobject sobj= descSobjRes.getSObjectType().newSObject();
         for(Common_JSON_Mapping_Setting__mdt mapping: mappingList){
             
-            //String sobjectTypeStr = (String)mapping.get('Sobject__c');
             String sobjFieldStr = (String)mapping.get('Field__c');
             System.debug(LoggingLevel.Debug,'Definiton Key:'+sobjFieldStr);
+            //System.debug(LoggingLevel.DEBUG,'@causeofloss'+ descSobjRes.fields.getMap().get(sobjFieldStr).getDescribe());
+            //System.debug(LoggingLevel.DEBUG, descSobjRes.fields.getMap().get('csundrwrtr__'+sobjFieldStr).getDescribe());
             if(descSobjRes.fields.getMap().containsKey(sobjFieldStr)){
                 Schema.SobjectField fieldToken = descSobjRes.fields.getMap().get(sobjFieldStr);
                 Schema.DescribeFieldResult dfr = fieldToken.getDescribe();
-                String definitionMap_SobjFieldValue = (String)mapping.get('ResponseFieldKey__c');
-                Object response_obj_fieldValue = res_obj_field_values.get(definitionMap_SobjFieldValue);
-                
-                System.debug(LoggingLevel.Debug,'Definiton Key:'+sobjFieldStr);
-                System.debug(LoggingLevel.Debug,'Definition value:'+definitionMap_SobjFieldValue);
-                System.debug(LoggingLevel.Debug,'Definition Response:'+String.valueOf(response_obj_fieldValue));
-                
-                
-                System.debug(LoggingLevel.Debug,'sobj field value'+Json.serialize(response_obj_fieldValue));
-                if(dfr.isUpdateable()){
-                    if(response_obj_fieldValue!=null){
-                        Object value = convertFieldValueToObject(dfr.getName(), response_obj_fieldValue,String.valueOf(dfr.getSoapType()));
-                        sobj.put(sobjFieldStr,value);
+                if(dfr.isAccessible() && dfr.isUpdateable()){
+                    String definitionMap_SobjFieldValue = (String)mapping.get('ResponseFieldKey__c');
+                    Object response_obj_fieldValue = res_obj_field_values.get(definitionMap_SobjFieldValue);
+                    
+                    System.debug(LoggingLevel.Debug,'Definiton Key:'+sobjFieldStr);
+                    System.debug(LoggingLevel.Debug,'Definition value:'+definitionMap_SobjFieldValue);
+                    System.debug(LoggingLevel.Debug,'Definition Response:'+String.valueOf(response_obj_fieldValue));
+                    
+                    
+                    System.debug(LoggingLevel.Debug,'sobj field value'+Json.serialize(response_obj_fieldValue));
+                    if(dfr.isUpdateable()){
+                        if(response_obj_fieldValue!=null){
+                            Object value = convertFieldValueToObject(dfr.getName(), response_obj_fieldValue,String.valueOf(dfr.getSoapType()));
+                            sobj.put(sobjFieldStr,value);
+                        }
                     }
                 }
+                
             }
         }
 

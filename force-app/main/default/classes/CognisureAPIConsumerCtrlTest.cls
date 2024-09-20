@@ -104,15 +104,22 @@ private with sharing class CognisureAPIConsumerCtrlTest {
     }
 
     private static testMethod void testGlobalMethod_invokeLoadFromStaticResource(){
-        List<Submission__c> submisstionList = [Select Id,name from Submission__c limit 1];
+        //createNonSetupTestData();
+        List<Submission__c> submisstionList = [Select Id,name,case__c from Submission__c limit 1];
         System.assert(submisstionList.size()>0, 'Submission Record Does not Exist');
         String SubmisisonId = submisstionList[0].Id;
+        System.assert(submisstionList[0].case__c!=null, 'Submission case Does not Exist');
+        
         Test.startTest();
-        CognisureAPI.invokeLoadFromStaticResource(SubmisisonId);
+        List<StaticResource> sr = [Select id,name,body from StaticResource where Name = 'submissionrespunformatted'];
+        System.assert(sr.size()>0,'Static Resource is not available');
+        String submissionResponseJson =  EncodingUtil.base64Decode(EncodingUtil.base64Encode(sr[0].body)).toString();
+        System.assert(!String.isBlank(submissionResponseJson),'JSON Response is blank');
         try{
-            //CognisureAPI.invokeLoadFromStaticResource('a00DS00000Bz1m6YAB');
+        CognisureAPI_Util.invokeLoadFromStaticResource(SubmisisonId);
         }
         catch(Exception Ex){
+            System.debug(LoggingLevel.ERROR, ex.getMessage() + ex.getCause());
 
         }
         List<Account> AcctList = [Select Id,name,RecordTypeId from Account where createdDate = Today];
@@ -154,15 +161,28 @@ private with sharing class CognisureAPIConsumerCtrlTest {
 
     @TestSetup
     private static void createTestData() {
+        List<PermissionSet> p = [Select id,name from PermissionSet where name= 'Cognisuire_AI'];
+        System.assert(p.size()>0, 'No permission set Cognisuire_AI' );
+        List<PermissionSetAssignment> permissionSetAssignment = [Select Id from PermissionSetAssignment where  PermissionSetId=:p[0].Id and AssigneeId=:UserInfo.getUserId()];
+        if(permissionSetAssignment.size()==0){
+            PermissionSetAssignment pa = new PermissionSetAssignment(AssigneeId=UserInfo.getUserId(), PermissionSetId=p[0].Id);
+
+            Insert pa;
+        }
+        createNonSetupTestData();
+    }
+
+    
+    private static void createNonSetupTestData(){
         List<Sobject> cases = getCases();
         Insert cases;
         Case case0 = (case) cases[0];
         createEmailMessage(case0.Id);
         List<Sobject> submisisonList = getSubmissionList();
+        submisisonList[0].put('case__c',case0.Id);
         insert submisisonList;
         CognisureAPIRequestsTest.runTestDataTest();
-        MappingDefinitionCtrl.getStaticResourceData();
-
+        //MappingDefinitionCtrl.getStaticResourceData();
     }
 
 
@@ -269,7 +289,6 @@ private with sharing class CognisureAPIConsumerCtrlTest {
                 '    "Common_JSON_Status__c": false,\n' +
                 '    "Custom_JSON_Status__c": false,\n' +
                 '    "Message_Id__c": null,\n' +
-                '    "Name": "s-0001",\n' +
                 '    "Submission_360_Status__c": false,\n' +
                 '    "Submission_Id__c": null\n' +
                 '  }\n' +
@@ -281,8 +300,8 @@ private with sharing class CognisureAPIConsumerCtrlTest {
     private static testmethod void testCustomSettingMapping(){
         Id submissionId = [Select id,name from Submission__c limit 1].Id;
         System.assert(submissionId!=null,'Submission Id is null');
-        string jsonresp = CognisureAPIRequestsTest.getCommonJSONAPIResponse();
-        ProcessSubmissionResponse_mdt.processJSONResponse('',submissionId);
+        string jsonresp = CognisureAPIRequestsTest.getCommonjsonAPIResp2();
+        //ProcessSubmissionResponse_mdt.processJSONResponse('',submissionId);
         ProcessSubmissionResponse.processJSONResponse(jsonresp,submissionId);
         Account a = [Select id,name from account where CreatedDate=Today limit 1];
         System.assert(a!=null,'Account not created');

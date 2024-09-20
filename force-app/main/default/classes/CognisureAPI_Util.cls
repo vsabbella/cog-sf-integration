@@ -2,35 +2,21 @@
  * Author : vsabbella
  */
 public with sharing class CognisureAPI_Util {
-    //System.debug(CognisureAPI_Util.getNamespacePrefix());
-    public static string NameSpacePrefix{
+
+    public static String NAMESPACEPREFIX{
         get{
-            if(NameSpacePrefix==null){
-                NameSpacePrefix=getNamespacePrefix();
+            if(NAMESPACEPREFIX==null){
+                Schema.DescribeSObjectResult dsr = Cognisureapi__mdt.sObjectType.getDescribe();
+                String namespacePrefix0 = dsr.getName().remove(dsr.getLocalName());
+                System.debug(LoggingLevel.DEBUG, namespacePrefix0);
+                
             }
-            return NameSpacePrefix;
+            return NAMESPACEPREFIX;
         }
         private set;
-       
     }
-    private static String getNamespacePrefix() {
-        Integer indexOfToken = -1;
-        String namespace = '';
-        for ( Schema.SObjectType type : Schema.getGlobalDescribe().values() ) {
-            String sobjName = String.valueOf(type);
     
-            if (null != sobjName) {
-                indexOfToken = sobjName.indexOf('Cognisureapi');
-            }
-    
-            if (indexOfToken != -1) {
-                namespace = sobjName.substring(0, indexOfToken);
-                break;
-            }
-        }
-    
-        return namespace;
-    }
+
 
     public Static String getSubmissionId(){
         System.debug(LoggingLevel.DEBUG,'Submission Id from metadata'+(String)cognisureapimetadata.get('Submission_Id__c'));
@@ -67,26 +53,15 @@ public with sharing class CognisureAPI_Util {
                 }
             }*/
 
-            for(sobject s:records){
-                s.put('YearBuilt',2010);
-                if(!string.isBlank(rtId)){
-                    //s.put('RecordTypeId',rtId);
-                }
-            }
+           for(sobject s:records){
+               s.put('YearBuilt',2010);
+               if(!string.isBlank(rtId)){
+                 //s.put('RecordTypeId',rtId);
+               }
+           }
         }
         else if(sObjectType==Claim.SObjectType){
 
-        }
-        else if(sObjectType==Account.SObjectType){
-            Id rtId;
-            if(test.isRunningTest()){
-                for(RecordType rt : [Select Id,name,DeveloperName from RecordType where SobjectType = 'Account' and DeveloperName='Household']){
-                    rtId = rt.Id;
-                }
-                for(SObject s:records){
-                    s.put('RecordTypeId',rtId);
-                }
-            }
         }
         else if(sObjectType==InsurancePolicy.SObjectType){
             List<Product2> prods= [select id,name from product2 where IsActive=true limit 1];
@@ -104,44 +79,53 @@ public with sharing class CognisureAPI_Util {
     }
 
 
-    public Static string getBase64String(String caseId){
+    public Static string getBase64String(String caseId, String fileQueryString){
 
         System.debug(LoggingLevel.DEBUG,'From EmailAttachmentForm64');
-        String form64 = '';
-        vNHttpFormBuilder.WriteFileResult result;
-        for(Attachment att: [SELECT id,name,body FROM Attachment WHERE ParentId IN (SELECT Id FROM EmailMessage WHERE ParentId = :caseId)]){
-            blob blobcontent;
-            String file64Encoded = EncodingUtil.base64Encode(att.body);//string
-            blobcontent = EncodingUtil.base64Decode(file64Encoded);
+            String form64 = '';
+            vNHttpFormBuilder.WriteFileResult result;
+            for(Sobject sobj: Database.query(fileQueryString)){
+                blob blobcontent;
+                String fileContentField;
+                fileContentField = sobj.getSObjectType().toString()=='ContentVersion'?'VersionData':'Body';// read from contentvesion or attachment. 
+                //String base64Content = (String) sobj.get(fileContentField);
+                //String file64Encoded = EncodingUtil.base64Encode(att.body);//string
+                blobcontent =(blob) sobj.get(fileContentField);
+                String file64Encoded = EncodingUtil.base64Encode(blobcontent);//string
+    
+                form64 += vNHttpFormBuilder.WriteBoundary();
+                System.Debug(LoggingLevel.Debug,'first line');
+                System.Debug(LoggingLevel.Debug,form64);
+                String titleField = sobj.getSObjectType().toString()=='ContentVersion'?'Title':'Name';
+                String title = (String)sobj.get(titleField);
+                form64 += vNHttpFormBuilder.WriteBodyParameter('file', title+'.pdf');
+                System.Debug(LoggingLevel.Debug,'after parameter');
+                System.Debug(LoggingLevel.Debug,form64);
+                form64 += vNHttpFormBuilder.WriteBoundary();
+                
+                result = vNHttpFormBuilder.WriteFile('file', title+'.pdf', 'application/octet-stream', blobcontent);
+                form64 += result.Content;
+            }
+             
+            if(string.isBlank(form64)){
+                Throw New CognisureAPIException('Content not read from either files or attachments. Files/Attachemnts does not exist on case.');
+            }
+            
+            for(EmailMessage em:[SELECT Id,htmlbody FROM EmailMessage WHERE ParentId = :caseId order by createdDate desc limit 1]){
+                System.debug(LoggingLevel.DEBUG,'Attaching email body');
+                String emailbodyjson;
+                emailbodyjson = '{"emailbody":""+'+em.htmlbody+'}';
+                form64 += vNHttpFormBuilder.WriteBoundary();
+                System.Debug(LoggingLevel.Debug,'first line');
+                System.Debug(LoggingLevel.Debug,form64);
+                form64 += vNHttpFormBuilder.WriteBodyParameter('file', em.HtmlBody+'.json');
+                System.Debug(LoggingLevel.Debug,'after parameter');
+                System.Debug(LoggingLevel.Debug,form64);
+                form64 += vNHttpFormBuilder.WriteBoundary();
+            }
 
-            form64 += vNHttpFormBuilder.WriteBoundary();
-            System.Debug(LoggingLevel.Debug,'first line');
-            System.Debug(LoggingLevel.Debug,form64);
-            form64 += vNHttpFormBuilder.WriteBodyParameter('file', att.name+'.pdf');
-            System.Debug(LoggingLevel.Debug,'after parameter');
-            System.Debug(LoggingLevel.Debug,form64);
-            form64 += vNHttpFormBuilder.WriteBoundary();
-
-            result = vNHttpFormBuilder.WriteFile('file', att.name+'.pdf', 'application/octet-stream', blobcontent);
-            form64 += result.Content;
-        }
-
-
-        for(EmailMessage em:[SELECT Id,htmlbody FROM EmailMessage WHERE ParentId = :caseId order by createdDate desc limit 1]){
-            System.debug(LoggingLevel.DEBUG,'Attaching email body');
-            String emailbodyjson;
-            emailbodyjson = '{"emailbody":""+'+em.htmlbody+'}';
-            form64 += vNHttpFormBuilder.WriteBoundary();
-            System.Debug(LoggingLevel.Debug,'first line');
-            System.Debug(LoggingLevel.Debug,form64);
-            form64 += vNHttpFormBuilder.WriteBodyParameter('file', em.HtmlBody+'.json');
-            System.Debug(LoggingLevel.Debug,'after parameter');
-            System.Debug(LoggingLevel.Debug,form64);
-            form64 += vNHttpFormBuilder.WriteBoundary();
-        }
-
-        form64 += vNHttpFormBuilder.WriteBoundary(result.EndingType);
-        return form64;
+            form64 += vNHttpFormBuilder.WriteBoundary(result.EndingType);
+            return form64;
     }
 
     public static sobject getcognisureapimetadata() {
@@ -166,39 +150,36 @@ public with sharing class CognisureAPI_Util {
             submissionId0 = CognisureAPI_Util.getSubmissionId();
 
         }
-
+        List<Account> accountList = [Select Id,name from Account where createdDate =Today];
+        System.assert(accountList.size()==0,'Account should not exist yet.');
+        System.assert(String.isNotBlank(submissionResponseJson), 'Blank Json Response');
+        System.debug(LoggingLevel.Debug, '=========='+submissionResponseJson);
         if(string.isBlank(submissionId0)){
             Throw New CognisureAPIException('Submission Id is empty');
         }
-
+        
         ProcessSubmissionResponse.processJSONResponse(submissionResponseJson,submissionId0);
     }
 
-    /*public class LightningFileForm64Builder implements IBase64Handler{
 
-    public string getBase64String(String caseId){
-        blob blobcontent;
-        String form64 = '';
-        vNHttpFormBuilder.WriteFileResult result;
-        for(Attachment att: [SELECT id,name,body FROM Attachment WHERE ParentId IN (SELECT Id FROM EmailMessage WHERE ParentId = :caseId)]){
-            String file64Encoded = EncodingUtil.base64Encode(att.body);//string
-            blobcontent = EncodingUtil.base64Decode(file64Encoded);
-
-            form64 += vNHttpFormBuilder.WriteBoundary();
-            System.Debug(LoggingLevel.Debug,'first line');
-            System.Debug(LoggingLevel.Debug,form64);
-            form64 += vNHttpFormBuilder.WriteBodyParameter('file', att.name+'.pdf');
-            System.Debug(LoggingLevel.Debug,'after parameter');
-            System.Debug(LoggingLevel.Debug,form64);
-            form64 += vNHttpFormBuilder.WriteBoundary();
-
-            result = vNHttpFormBuilder.WriteFile('file', att.name+'.pdf', 'application/octet-stream', blobcontent);
-            form64 += result.Content;
-        }
-        form64 += vNHttpFormBuilder.WriteBoundary(result.EndingType);
-        return form64;
+    public static String getAttachmentQuery(String sobjId){
+        Id caseId = Id.valueOf(sobjId);
+        return 'SELECT id,name,body FROM Attachment WHERE ParentId IN (SELECT Id FROM EmailMessage WHERE ParentId = \''+caseId+'\')';
     }
-}*/
+
+    public static String getContentVersionQuery(String sobjId){
+        Id caseId = Id.valueOf(sobjId);
+        return 'SELECT Id, Title ,VersionData, ContentDocument.LatestPublishedVersion.FirstPublishLocationId ,ContentBodyId,FirstPublishLocationId  from  ContentVersion where FirstPublishLocationId In (Select Id from EmailMessage where ParentId In (\''+caseId+'\'))';
+    }
+
+    public static void schedulebatchjobs(){
+        CSFileUploadAPIConsumerBatch csfileupload = new CSFileUploadAPIConsumerBatch();
+        database.executebatch(csfileupload,1);
+
+
+        cssubmissionbatch b = new cssubmissionbatch();
+        database.executeBatch(b,1);
+    }
 
     private with sharing class CognisureAPIException extends Exception{
 
