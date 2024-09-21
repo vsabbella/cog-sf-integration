@@ -1,4 +1,4 @@
-Global with sharing class CognisureAPI {
+global with sharing class CognisureAPI {
 
     public class CognisureAPIException extends Exception{}
     

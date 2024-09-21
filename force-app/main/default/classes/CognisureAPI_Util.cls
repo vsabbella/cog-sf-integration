@@ -54,7 +54,7 @@ public with sharing class CognisureAPI_Util {
             }*/
 
            for(sobject s:records){
-               s.put('YearBuilt',2010);
+               //s.put('YearBuilt',2010);
                if(!string.isBlank(rtId)){
                  //s.put('RecordTypeId',rtId);
                }

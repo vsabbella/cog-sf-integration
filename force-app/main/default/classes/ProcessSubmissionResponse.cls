@@ -1,18 +1,7 @@
 /**
  * 
  * 
- String NAMESPACEPREFIX= 'csundrwrtr__';
- String caseFieldAPI = NAMESPACEPREFIX+'case__c';
- Submission__c s = [select Id,csundrwrtr__Case__c from Submission__c limit 1];
-Schema.DescribeSObjectResult[] descResult = Schema.describeSObjects(new List<String>{'Submission__c'});
-Schema.DescribeSObjectResult descResult0 = descResult[0];
-System.debug(LoggingLevel.Debug, descResult0.fields.getMap().get(caseFieldAPI));
-Schema.SobjectField fieldToken_case = descResult0.fields.getMap().get(caseFieldAPI);
-System.debug((String)s.get(fieldToken_case));
 
-Schema.DescribeSObjectResult dsr = Cognisureapi__mdt.sObjectType.getDescribe();
-String namespacePrefix = dsr.getName().remove(dsr.getLocalName());
-System.debug(namespacePrefix);
 
 
 
@@ -44,9 +33,6 @@ public with sharing class ProcessSubmissionResponse {
         get {
             if (cognisureapimetadata == null) {
                 cognisureapimetadata = (Sobject) Cognisureapi__mdt.getInstance('api_details');
-                if (test.isRunningTest()) {
-                    cognisureapimetadata = getMetadata();
-                }
             }
             return cognisureapimetadata;
         }
@@ -57,11 +43,11 @@ public with sharing class ProcessSubmissionResponse {
         get{
             if(fsc_sobject_field_defaults ==null){
                 List<StaticResource> srList = [Select Id,name,body from StaticResource where Name = : (String) cognisureapimetadata.get('Field_Default_Definition__c')];
+                if(srList.size()==0){
+                    Throw New CustomResponseException('Default Definiton Static Resource Not Found.');
+                }
                 if(srList.size()>0){
                     fsc_sobject_field_defaults = srList[0];
-                }
-                if(test.isRunningTest()){
-                    fsc_sobject_field_defaults = MappingDefinitionCtrl.get_cognisure_sffield_defaults_sr();
                 }
             }
             return fsc_sobject_field_defaults;
@@ -76,7 +62,7 @@ public with sharing class ProcessSubmissionResponse {
                     fsc_Sobject_ExternalId_Info = srList[0];
                 }
                 if(test.isRunningTest()){
-                    fsc_Sobject_ExternalId_Info = MappingDefinitionCtrl.get_cognisure_Sobject_External_Ids_sr();
+                    //fsc_Sobject_ExternalId_Info = MappingDefinitionCtrl.get_cognisure_Sobject_External_Ids_sr();
                 }
             }
             return fsc_Sobject_ExternalId_Info;
@@ -106,12 +92,12 @@ public with sharing class ProcessSubmissionResponse {
                     Throw New CustomResponseException('Mapping Data is Not accessible');
                 }
         
-        //System.debug(LoggingLevel.DEBUG,JSON.serialize(mappingRecordsIndexBy_RespObjects));
         return mappingRecordsIndexBy_Seq;
     }
     /*
     Delete [Select id,name from Claim where createdDate = Today]
-        ProcessSubmissionResponse.processJSONResponse('','a00DS00000Bz1m6YAB');
+    String jsonResponsemock = CommonJSONResponseTestData.getCommonjsonAPIResp_passwith1recordeach();
+    ProcessSubmissionResponse.processJSONResponse(jsonResponsemock,'a00DS00000Bz1m6YAB');
     */
     public static void processJSONResponse(String JSONRepsonse, Id submissionSobjId){
         
@@ -127,29 +113,23 @@ public with sharing class ProcessSubmissionResponse {
             System.debug(LoggingLevel.DEBUG, caseFieldAPI);
             SubsmsisonSobjRecord = [Select Id,case__c from Submission__c where Id =:submissionSobjId];
             Schema.SobjectField fieldToken_case = descRes.fields.getMap().get(caseFieldAPI);
-            //System.debug(LoggingLevel.DEBUG, descRes.fields.getMap());
             System.debug( fieldToken_case);
 
             Schema.DescribeFieldResult dfr_case = fieldToken_case.getDescribe();
-            if(dfr_case.accessible ){
+            //if(dfr_case.accessible ){
                 Id caseId = SubsmsisonSobjRecord.get(caseFieldAPI)!=null?String.valueOf(SubsmsisonSobjRecord.get(caseFieldAPI)):'';
                 if(!String.isBlank(caseId)){
                     parentSobjectIds.put('caseid',caseId);
                 }
-            }
-            else{
-                Throw New CustomResponseException('Case field on Submission Object is Not Accessible. Check permissions');
-            }
+            //}
+            //else{
+            //    Throw New CustomResponseException('Case field on Submission Object is Not Accessible. Check permissions');
+            //}
             
         }
         else{
             Throw New CustomResponseException('Submission record is not accessible. Check permissions on Submission Object.');
         }
-        
-        
-        //System.debug(LoggingLevel.debug, '-->'+submissionResponseJson);
-        
-        //Map<String,String> SobjectMapping = getSobjectMapping();
         //comes from static resouce mapping: CustomeObject => Response Element
         //StaticResource SR = [Select id,name,body from StaticResource where Name = 'submissionrespunformatted'];
         //String submissionResponseJson =  EncodingUtil.base64Decode(EncodingUtil.base64Encode(sr.body)).toString();
@@ -243,25 +223,7 @@ public with sharing class ProcessSubmissionResponse {
         SobjectsRecords_BySobjectString.get(sobjectTypeStr).addAll(sobjectList);
     }
     
-    /*public static void processResponseElements(String jsonResponseElement){
-        String jsonResponseElement2 = '{"Insured_Nm": "Carver & Carver Plumbing Inc.","Policy_Effectivedate": "09/12/2019","Policy_Expirydate": "09/12/2020","Policy_Nbr": "40466","Amount":1000,"Amount2":1000.0}';
-        JSONParser parser = JSON.createParser(jsonResponseElement2);
-        while (parser.nextToken() != null) {
-            if (parser.getCurrentToken() == JSONToken.FIELD_NAME) {
-                System.debug(LoggingLevel.DEBUG,parser.getText());
-                parser.nextToken();
-                System.debug(LoggingLevel.DEBUG,parser.getText());
-                
-            }
-            
-        }
-        // if(version != null && String.isNotEmpty(label)) {
-        //     apiVersionToReleaseNameMap.put(version, label);
-        //     version = null;
-        //     label = null; 
-        // }
-        
-    }*/
+
     
     private static String getSobjectsForDML(){
         sobject  cognisureapimetadata = (Sobject) Cognisureapi__mdt.getInstance('api_details');
@@ -388,15 +350,10 @@ public with sharing class ProcessSubmissionResponse {
     
     
     private static List<Sobject> processSobjectInfo(List<Object> respObjList,  Map<String,Schema.DescribeSObjectResult> descSobjResMap, List<Common_JSON_Mapping_Setting__mdt> mappingList){
-        
-        
-        //DescribeSObjectResult descSobjRes = descResMap.get(sobjectType);
-        //System.debug(LoggingLevel.Debug, 'respObjList:'+JSON.serialize(respObjList));
         System.debug(LoggingLevel.Debug, 'respObjList size'+respObjList.size());
         List<Sobject> sobjList = new List<Sobject>();
 
         for(Object obj:respObjList){
-            //System.debug(LoggingLevel.debug, 'obj: '+JSON.serialize(obj));
             Sobject sobj = populateSobjectWithFieldValues(descSobjResMap,obj, mappingList);
             sobjList.add(sobj);
         }
@@ -415,8 +372,8 @@ public with sharing class ProcessSubmissionResponse {
         Schema.DescribeSObjectResult descSobjRes = descSobjResMap.get(Sobjectname);
         Map<String,Object> DefaultfieldMapByObject = (Map<String, Object>)JSON.deserializeUntyped(DefaultfieldMapStr);
         Map<String,Object> DefaultsMap_Sobject = (Map<String,Object>)DefaultfieldMapByObject.get(Sobjectname);
-        
-        if(descSobjRes.isAccessible() && descSobjRes.isCreateable()){
+
+        if(descSobjRes.isAccessible() && descSobjRes.isCreateable()){}
             if(DefaultsMap_Sobject!=null){
                 for(Sobject sobj:sobjList){
                     String Sobjname = sobj.getSObjectType().toString();
@@ -424,29 +381,28 @@ public with sharing class ProcessSubmissionResponse {
                         for(String Str : DefaultsMap_Sobject.keySet()){
                                 Schema.SobjectField fieldToken = descSobjRes.fields.getMap().get(Str);
                                 Schema.DescribeFieldResult dfr = fieldToken.getDescribe();
-                                if(dfr.isAccessible() && dfr.isUpdateable()){
-                                    if(!Sobj.isSet(Str)    ) {
-                                
+                                System.debug(LoggingLevel.DEBUG, 'Setting Default for '+Sobjectname+' field: '+dfr.getName());
+                                System.debug(LoggingLevel.DEBUG, 'Set Value on Field:'+sobj.get(dfr.getName()));
+                                System.debug(LoggingLevel.DEBUG, 'field is set:'+Sobj.isSet(Str));
+
+                                 if(dfr.isAccessible() && dfr.isUpdateable()){
+                                    if(!Sobj.isSet(Str)) {
+                                        System.debug(LoggingLevel.DEBUG, 'String ::'+Str);
                                         Object o = (Object)DefaultsMap_Sobject.get(Str);
                                         System.debug(LoggingLevel.Debug, 'fieldName: '+dfr.getName()+': Type: '+dfr.getSoapType());
                                         o=convertFieldValueToObject(dfr.getName(), o,String.valueOf(dfr.getSoapType()));
-                                        System.debug(LoggingLevel.Debug, ''+o);
+                                        System.debug(LoggingLevel.Debug, 'Default Value for '+Sobjectname+':'+dfr.getName()+':'+String.ValueOf(o));
                                         sobj.put(Str,o);
                                     
                                     }
-                                }
-                            
-                            
+                                 }
                         }
                     }
                     
                 }
                 
             }
-        }
-        
-        
-        
+
     }
     
     public static Sobject populateSobjectWithFieldValues(Map<String,Schema.DescribeSObjectResult> descSobjResMap, Object resp_obj,  List<Common_JSON_Mapping_Setting__mdt> mappingList){
@@ -464,25 +420,24 @@ public with sharing class ProcessSubmissionResponse {
             
             String sobjFieldStr = (String)mapping.get('Field__c');
             System.debug(LoggingLevel.Debug,'Definiton Key:'+sobjFieldStr);
-            //System.debug(LoggingLevel.DEBUG,'@causeofloss'+ descSobjRes.fields.getMap().get(sobjFieldStr).getDescribe());
-            //System.debug(LoggingLevel.DEBUG, descSobjRes.fields.getMap().get('csundrwrtr__'+sobjFieldStr).getDescribe());
             if(descSobjRes.fields.getMap().containsKey(sobjFieldStr)){
                 Schema.SobjectField fieldToken = descSobjRes.fields.getMap().get(sobjFieldStr);
                 Schema.DescribeFieldResult dfr = fieldToken.getDescribe();
                 if(dfr.isAccessible() && dfr.isUpdateable()){
                     String definitionMap_SobjFieldValue = (String)mapping.get('ResponseFieldKey__c');
                     Object response_obj_fieldValue = res_obj_field_values.get(definitionMap_SobjFieldValue);
-                    
+                    String response_obj_fieldValueStr = String.valueOf(response_obj_fieldValue);
+
                     System.debug(LoggingLevel.Debug,'Definiton Key:'+sobjFieldStr);
                     System.debug(LoggingLevel.Debug,'Definition value:'+definitionMap_SobjFieldValue);
                     System.debug(LoggingLevel.Debug,'Definition Response:'+String.valueOf(response_obj_fieldValue));
-                    
-                    
                     System.debug(LoggingLevel.Debug,'sobj field value'+Json.serialize(response_obj_fieldValue));
-                    if(dfr.isUpdateable()){
-                        if(response_obj_fieldValue!=null){
-                            Object value = convertFieldValueToObject(dfr.getName(), response_obj_fieldValue,String.valueOf(dfr.getSoapType()));
-                            sobj.put(sobjFieldStr,value);
+                    if(String.isNotBlank(response_obj_fieldValueStr)){
+                        if(dfr.isUpdateable()){
+                            if(response_obj_fieldValue!=null){
+                                Object value = convertFieldValueToObject(dfr.getName(), response_obj_fieldValue,String.valueOf(dfr.getSoapType()));
+                                sobj.put(sobjFieldStr,value);
+                            }
                         }
                     }
                 }
@@ -496,10 +451,8 @@ public with sharing class ProcessSubmissionResponse {
     
     public static Object convertFieldValueToObject(String field, Object response_claimfieldValue, String reqdatatype){
         
-        //Map<String,Object> o = (Map<String,Object>) claimObj;
         Object value = response_claimfieldValue;
-        //String str =  getInputValueAsString( value);
-        
+
         if(reqdatatype=='STRING'){
             if(value instanceof String){
                 return value;
@@ -605,30 +558,4 @@ public with sharing class ProcessSubmissionResponse {
         return str;
     }
     
-    private static SObject getMetadata() {
-        String metadataJSON = '[\n' +
-            '  {\n' +
-            '    "Base_URL__c": "https://api.cognisure.ai",\n' +
-            '    "DeveloperName": "api_details",\n' +
-            '    "Id": "m0PHp0000004mUPMAY",\n' +
-            '    "Label": "api-details",\n' +
-            '    "Language": "en_US",\n' +
-            '    "MasterLabel": "api-details",\n' +
-            '    "NamespacePrefix": null,\n' +
-            '    "Password__c": "{!$Credential.Cognisure.password}",\n' +
-            '    "QualifiedApiName": "api_details",\n' +
-            '    "Token_Response_Key__c": "access_token",\n' +
-            '    "Token_URL__c": "/token",\n' +
-            '    "Upload_API_Endpoint__c": "/api/submission/upload?id={0}&submissionName={1}",\n' +
-            '    "Username__c": "{!$Credential.Cognisure.username}",\n' +
-            '    "Common_JSON_URL__c": "/api/submission/commonjson/?id={0}",\n' +
-            '    "Email_Message_Query_Plugin__c": "CognisureAPI.MessageQueryBuilder",\n' +
-            '    "Submission_Query_Plugin__c": "CognisureAPI.SubmissionQueryBuilder",\n' +
-            '    "Upload_API_Plugin__c": "CognisureAPI.EmailAttachmentForm64",\n' +
-            '    "NamedCredentail__c": "cognisureai"\n' +
-            '  }\n' +
-            ']';
-        List<Sobject> metadataList = (List<Cognisureapi__mdt>) JSON.deserialize(metadataJSON, List<Cognisureapi__mdt>.class);
-        return metadataList[0];
-    }
 }

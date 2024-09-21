@@ -176,6 +176,9 @@ public with sharing class CognisureAPIConsumerCtrl {
                 if (responseStatusCode == '401')
                     throw new CognisureAPIConsumerCtrlException('Unauthorized response code:');
 
+                if (responseStatusCode != '200')
+                    throw new CognisureAPIConsumerCtrlException('Callout Failed with response code :'+ responseStatusCode);
+
                 System.debug(LoggingLevel.Debug, 'resp body' + responseBody);
                 System.debug(LoggingLevel.Debug, 'resp body' + responseStatusCode);
                 return responseBody;

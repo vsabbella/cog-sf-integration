@@ -6,26 +6,13 @@
 private with sharing class CognisureAPIConsumerCtrlTest {
 
     private static testMethod void TestUploadPIRequests() {
-        Sobject s = getMetadata();
+        Sobject s = Cognisureapi__mdt.getInstance('api_details');
+        System.assert(s!=null, 'cognisureapimetadata is not found.');
         Case case0 = [select Id from case order by createdDate desc limit 1];
         Test.startTest();
         CognisureAPIConsumerCtrl c = new CognisureAPIConsumerCtrl();
         c.makeUploadRequestdo( case0.Id);
         Test.stopTest();
-
-        /*
-         CognisureAPIConsumerCtrl c = new CognisureAPIConsumerCtrl();
-         Case case0 = [select Id from case order by createdDate desc limit 1];
-         c.makeUploadRequestdo(token, '500Hp00001fQg3LIAS');
-         */
-
-/*
-         CognisureAPIConsumerCtrl c = new CognisureAPIConsumerCtrl();
-         c.getCommonJSONforSubmission(token, '60f392d8-2368-4963-93ae-a3eae529b8b3');
-
-*/
-
-
     }
 
     private static testMethod void testCSFileUPloadBatch() {
@@ -74,9 +61,8 @@ private with sharing class CognisureAPIConsumerCtrlTest {
     }
 
     private static testMethod void TestCommonJSONResponse() {
-        Sobject s = getMetadata();
-        //Sobject cognisureapimetadata = (Sobject)Cognisureapi__mdt.getInstance('api-details');
-        //System.assert(cognisureapimetadata!=null, 'cognisureapimetadata is not found.');
+        Sobject s = Cognisureapi__mdt.getInstance('api_details');
+        System.assert(s!=null, 'cognisureapimetadata is not found.');
         Case case0 = [select Id from case limit 1];
         Test.startTest();
         CognisureAPIConsumerCtrl c = new CognisureAPIConsumerCtrl();
@@ -101,6 +87,172 @@ private with sharing class CognisureAPIConsumerCtrlTest {
 
         }
         Test.stopTest();
+    }
+
+    private static testMethod void testJsonResponse_passwith1RecordEach(){
+        String jsonResponse = CommonJSONResponseTestData.getCommonjsonAPIResp_passwith1recordeach();
+        List<Submission__c> submisstionList = [Select Id,name,case__c from Submission__c limit 1];
+        System.assert(submisstionList.size()>0, 'Submission Record Does not Exist');
+        String SubmisisonId = submisstionList[0].Id;
+        System.assert(submisstionList[0].case__c!=null, 'Submission case Does not Exist');
+        
+        Test.startTest();
+        List<StaticResource> sr = [Select id,name,body from StaticResource where Name = 'submissionrespunformatted'];
+        System.assert(sr.size()>0,'Static Resource is not available');
+        String submissionResponseJson =  EncodingUtil.base64Decode(EncodingUtil.base64Encode(sr[0].body)).toString();
+        System.assert(!String.isBlank(submissionResponseJson),'JSON Response is blank');
+        
+        try{
+            ProcessSubmissionResponse.processJSONResponse(jsonResponse,SubmisisonId);
+        }
+        catch(Exception Ex){
+            System.debug(LoggingLevel.ERROR, ex.getMessage() + ex.getCause());
+            System.assert(false, 'Error:'+Ex.getCause()+Ex.getMessage());
+        }
+        List<Account> AcctList = [Select Id,name,RecordTypeId from Account where createdDate = Today];
+        System.assert(AcctList.size()==1, 'Account Not created');
+        System.Debug(LoggingLevel.DEBUG,'Accounts:'+JSON.serialize(AcctList));
+
+
+
+        List<Claim> Claims = [Select Id,Name,AccountId,IsDrivable,Status  from Claim where createdDate = Today];
+        System.assert(Claims.size()==1, 'Claims Not created');
+        System.Debug(LoggingLevel.DEBUG,'Claims:'+JSON.serialize(Claims));
+
+        List<CustomerProperty> CustomerProperties = [Select Id,PrimaryOwnerId,FloorType,FoundationType,GarageType,
+                LotArea,CeilingType,DwellingType,PurchasePrice,RoofType,BedroomCount,BuiltUpArea,EngineDisplacementVolume,FairMarketValue,FloorCount,IsBasementIncluded,
+                IsChimneyIncluded,IsPassedSmogCheck,IsSwimmingPoolIncluded,PurchaseDate,YearBuilt
+        from CustomerProperty where createdDate = Today];
+        System.assert(CustomerProperties.size()==1, 'CustomerProperties Not created');
+        System.Debug(LoggingLevel.DEBUG,'CustomerProperties:'+JSON.serialize(CustomerProperties));
+
+
+        List<CoverageType> CoverageTypes = [Select Id,Category,CategoryGroup,CategoryGroupType,CategoryGroupTypeValue,DeductibleAmount,EffectiveDate,ExpirationDate,LimitAmount,LimitRange,Name,SourceSystemIdentifier
+        from CoverageType where createdDate = Today];
+        System.assert(CoverageTypes.size()>0, 'CoverageTypes Not created');
+        System.Debug(LoggingLevel.DEBUG,'CoverageTypes:'+JSON.serialize(CoverageTypes));
+
+        List<InsurancePolicy> InsurancePolicies = [Select Id,Name
+        from InsurancePolicy where createdDate = Today];
+        //System.assert(InsurancePolicies.size()>0, 'InsurancePolicies Not created');
+        System.Debug(LoggingLevel.DEBUG,'InsurancePolicies:'+JSON.serialize(InsurancePolicies));
+
+        Test.stopTest();
+    
+    }
+
+    private static testMethod void testJsonResponse_2Accounts_2Claims(){
+        String jsonResponse = CommonJSONResponseTestData.getCommonjsonAPIResp_MulitpleRecords();
+        List<Submission__c> submisstionList = [Select Id,name,case__c from Submission__c limit 1];
+        System.assert(submisstionList.size()>0, 'Submission Record Does not Exist');
+        String SubmisisonId = submisstionList[0].Id;
+        System.assert(submisstionList[0].case__c!=null, 'Submission case Does not Exist');
+
+        Test.startTest();
+        List<StaticResource> sr = [Select id,name,body from StaticResource where Name = 'submissionrespunformatted'];
+        System.assert(sr.size()>0,'Static Resource is not available');
+        String submissionResponseJson =  EncodingUtil.base64Decode(EncodingUtil.base64Encode(sr[0].body)).toString();
+        System.assert(!String.isBlank(submissionResponseJson),'JSON Response is blank');
+
+        try{
+            ProcessSubmissionResponse.processJSONResponse(jsonResponse,SubmisisonId);
+        }
+        catch(Exception Ex){
+            System.debug(LoggingLevel.ERROR, ex.getMessage() + ex.getCause());
+            System.assert(false, 'Error:'+Ex.getCause()+Ex.getMessage());
+        }
+        List<Account> AcctList = [Select Id,name,RecordTypeId from Account where createdDate = Today];
+        System.assert(AcctList.size()==1, 'Account Not created');
+        System.Debug(LoggingLevel.DEBUG,'Accounts:'+JSON.serialize(AcctList));
+
+
+
+        List<Claim> Claims = [Select Id,Name,AccountId,IsDrivable,Status  from Claim where createdDate = Today];
+        System.assert(Claims.size()==2, 'Claims Not created');
+        System.Debug(LoggingLevel.DEBUG,'Claims:'+JSON.serialize(Claims));
+
+        List<CustomerProperty> CustomerProperties = [Select Id,PrimaryOwnerId,FloorType,FoundationType,GarageType,
+                LotArea,CeilingType,DwellingType,PurchasePrice,RoofType,BedroomCount,BuiltUpArea,EngineDisplacementVolume,FairMarketValue,FloorCount,IsBasementIncluded,
+                IsChimneyIncluded,IsPassedSmogCheck,IsSwimmingPoolIncluded,PurchaseDate,YearBuilt
+        from CustomerProperty where createdDate = Today];
+        System.assert(CustomerProperties.size()==1, 'CustomerProperties Not created');
+        System.Debug(LoggingLevel.DEBUG,'CustomerProperties:'+JSON.serialize(CustomerProperties));
+
+
+        List<CoverageType> CoverageTypes = [Select Id,Category,CategoryGroup,CategoryGroupType,CategoryGroupTypeValue,DeductibleAmount,EffectiveDate,ExpirationDate,LimitAmount,LimitRange,Name,SourceSystemIdentifier
+        from CoverageType where createdDate = Today];
+        System.assert(CoverageTypes.size()>0, 'CoverageTypes Not created');
+        System.Debug(LoggingLevel.DEBUG,'CoverageTypes:'+JSON.serialize(CoverageTypes));
+
+        List<InsurancePolicy> InsurancePolicies = [Select Id,Name
+        from InsurancePolicy where createdDate = Today];
+        //System.assert(InsurancePolicies.size()>0, 'InsurancePolicies Not created');
+        System.Debug(LoggingLevel.DEBUG,'InsurancePolicies:'+JSON.serialize(InsurancePolicies));
+
+        Test.stopTest();
+
+    }
+
+    private static testMethod void Test_EmptyclaimName_EmptyAccountName(){
+        String jsonResponse = CommonJSONResponseTestData.getCommonjsonAPIResp_EmptyclaimName_EmptyAccountName();
+        List<Submission__c> submisstionList = [Select Id,name,case__c from Submission__c limit 1];
+        Cognisureapi__mdt apimdt = Cognisureapi__mdt.getInstance('api_details');
+        System.assert(apimdt!=null, 'Cognisure metadata is not available');
+        System.assert((String)apimdt.get('Field_Default_Definition__c')!=null, 'Cognisure Static Resource Default  definition is not available');
+        System.assert(submisstionList.size()>0, 'Submission Record Does not Exist');
+        String SubmisisonId = submisstionList[0].Id;
+        System.assert(submisstionList[0].case__c!=null, 'Submission case Does not Exist');
+        
+        Test.startTest();
+        List<StaticResource> sr = [Select id,name,body from StaticResource where Name = 'submissionrespunformatted'];
+        System.assert(sr.size()>0,'Static Resource is not available');
+        String submissionResponseJson =  EncodingUtil.base64Decode(EncodingUtil.base64Encode(sr[0].body)).toString();
+        System.assert(!String.isBlank(submissionResponseJson),'JSON Response is blank');
+
+        List<StaticResource> srList = [Select Id,name,body from StaticResource where Name = 'cognisure_sffield_defaults'];
+        System.assert(srList.size()>0,'Static Resource is not available');
+        String submissionResponseJson2 =  EncodingUtil.base64Decode(EncodingUtil.base64Encode(srList[0].body)).toString();
+        System.assert(!String.isBlank(submissionResponseJson2),'JSON Response is blank');
+        
+        try{
+            ProcessSubmissionResponse.processJSONResponse(jsonResponse,SubmisisonId);
+        }
+        catch(Exception Ex){
+            System.debug(LoggingLevel.ERROR, ex.getMessage() + ex.getCause());
+            System.assert(false, 'Error:'+Ex.getCause()+Ex.getMessage());
+        }
+        List<Account> AcctList = [Select Id,name,RecordTypeId from Account where createdDate = Today];
+        System.assert(AcctList.size()==1, 'Account Not created');
+        System.Debug(LoggingLevel.DEBUG,'Accounts:'+JSON.serialize(AcctList));
+        System.assert(AcctList[0].Name=='Cognisure Test Account','Account Default Name is Not Correct '+AcctList[0].Name );
+
+
+
+        List<Claim> Claims = [Select Id,Name,AccountId,IsDrivable,Status  from Claim where createdDate = Today];
+        System.assert(Claims.size()==1, 'Claims Not created');
+        System.Debug(LoggingLevel.DEBUG,'Claims:'+JSON.serialize(Claims));
+        System.assert(Claims[0].Name=='Cognisure Default','Claim Default Name is Not Correct '+Claims[0].Name);
+
+        List<CustomerProperty> CustomerProperties = [Select Id,PrimaryOwnerId,FloorType,FoundationType,GarageType,
+                LotArea,CeilingType,DwellingType,PurchasePrice,RoofType,BedroomCount,BuiltUpArea,EngineDisplacementVolume,FairMarketValue,FloorCount,IsBasementIncluded,
+                IsChimneyIncluded,IsPassedSmogCheck,IsSwimmingPoolIncluded,PurchaseDate,YearBuilt
+        from CustomerProperty where createdDate = Today];
+        System.assert(CustomerProperties.size()==1, 'CustomerProperties Not created');
+        System.Debug(LoggingLevel.DEBUG,'CustomerProperties:'+JSON.serialize(CustomerProperties));
+
+
+        List<CoverageType> CoverageTypes = [Select Id,Category,CategoryGroup,CategoryGroupType,CategoryGroupTypeValue,DeductibleAmount,EffectiveDate,ExpirationDate,LimitAmount,LimitRange,Name,SourceSystemIdentifier
+        from CoverageType where createdDate = Today];
+        System.assert(CoverageTypes.size()>0, 'CoverageTypes Not created');
+        System.Debug(LoggingLevel.DEBUG,'CoverageTypes:'+JSON.serialize(CoverageTypes));
+
+        List<InsurancePolicy> InsurancePolicies = [Select Id,Name
+        from InsurancePolicy where createdDate = Today];
+        //System.assert(InsurancePolicies.size()>0, 'InsurancePolicies Not created');
+        System.Debug(LoggingLevel.DEBUG,'InsurancePolicies:'+JSON.serialize(InsurancePolicies));
+
+        Test.stopTest();
+    
     }
 
     private static testMethod void testGlobalMethod_invokeLoadFromStaticResource(){
@@ -145,9 +297,7 @@ private with sharing class CognisureAPIConsumerCtrlTest {
         System.assert(CoverageTypes.size()>0, 'CoverageTypes Not created');
         System.Debug(LoggingLevel.DEBUG,'CoverageTypes:'+JSON.serialize(CoverageTypes));
 
-        List<InsurancePolicy> InsurancePolicies = [Select Id,Name
-        from InsurancePolicy where createdDate = Today];
-        //System.assert(InsurancePolicies.size()>0, 'InsurancePolicies Not created');
+        List<InsurancePolicy> InsurancePolicies = [Select Id,Name from InsurancePolicy where createdDate = Today];
         System.Debug(LoggingLevel.DEBUG,'InsurancePolicies:'+JSON.serialize(InsurancePolicies));
 
         Test.stopTest();
@@ -213,33 +363,15 @@ private with sharing class CognisureAPIConsumerCtrlTest {
                 '  {\n' +
                 '    "AccountId": null,\n' +
                 '    "CaseNumber": "00001044",\n' +
-                '    "ClosedDate": null,\n' +
-                '    "Comments": null,\n' +
-                '    "ContactEmail": null,\n' +
-                '    "ContactFax": null,\n' +
-                '    "ContactId": null,\n' +
-                '    "ContactMobile": null,\n' +
-                '    "ContactPhone": null,\n' +
-                '    "Description": "Attaching both the documents\\n\\nThank you,\\nVenkata.",\n' +
-                '    "FinServ__FinancialAccount__c": null,\n' +
-                // '    "FinServ__Household__c": null,\n' +
+                '    "Description": "Attaching both the documents Thank you, myname.",\n' +
                 //'    "Id": "500Hp00001fQeMTIA0",\n' +
-                '    "IsClosed": false,\n' +
-                '    "IsDeleted": false,\n' +
-                '    "IsEscalated": false,\n' +
-                '    "MasterRecordId": null,\n' +
                 '    "Origin": "Email",\n' +
-                '    "ParentId": null,\n' +
                 '    "Priority": "Medium",\n' +
                 '    "Processed_By_Cognisure__c": false,\n' +
-                '    "Reason": null,\n' +
-                //'    "SourceId": "02sHp00001RwJDfIAN",\n' +
                 '    "Status": "New",\n' +
                 '    "Subject": "Documents from ABC TOP CO",\n' +
-                '    "SuppliedCompany": null,\n' +
-                '    "SuppliedEmail": "venkats@cognisure.ai",\n' +
-                '    "SuppliedName": "VenkatS",\n' +
-                '    "SuppliedPhone": null,\n' +
+                '    "SuppliedEmail": "myemail@cognisure.ai",\n' +
+                '    "SuppliedName": "myname",\n' +
                 '    "Type": null\n' +
                 '  }\n' +
                 ']';
@@ -257,30 +389,6 @@ private with sharing class CognisureAPIConsumerCtrlTest {
 
     }
 
-    private static Sobject getMetadata() {
-        String metadataJSON = '[\n' +
-                '  {\n' +
-                '    "Base_URL__c": "https://pcqa.cognisure.ai:1099",\n' +
-                '    "DeveloperName": "api_details",\n' +
-                //'    "Id": "m0PHp0000004mUPMAY",\n' +
-                '    "Label": "api-details",\n' +
-                '    "Language": "en_US",\n' +
-                '    "MasterLabel": "api-details",\n' +
-                '    "NamespacePrefix": null,\n' +
-                '    "Password__c": "Cognisure@40123",\n' +
-                '    "QualifiedApiName": "api_details",\n' +
-                '    "SystemModstamp": "2024-01-27T01:18:06.000+0000",\n' +
-                '    "Token_Response_Key__c": "access_token",\n' +
-                '    "Token_URL__c": "/token",\n' +
-                '    "Upload_API_Endpoint__c": "/api/submission/upload",\n' +
-                '    "Upload_API_Name_Parameter__c": "submissionName",\n' +
-                '    "Upload_API_implementation__c": "CognisureAPI.EmailAttachmentForm64",\n' +
-                '    "Username__c": "cssfapiuser@cognisure.ai"\n' +
-                '  }\n' +
-                ']';
-        List<Sobject> metadataList = (List<Cognisureapi__mdt>) JSON.deserialize(metadataJSON, List<Cognisureapi__mdt>.class);
-        return metadataList[0];
-    }
 
     private static List<Sobject> getSubmissionList() {
         String SubmssionJSON = '[\n' +
@@ -309,11 +417,118 @@ private with sharing class CognisureAPIConsumerCtrlTest {
         System.assert(claimsList.size()>0,'Claims not created..');
     }
 
-    private static void testInsertClaimRecords(){
-        String claimJson = '[{"attributes":{"type":"Claim"},"Name":"Test0", "IsDrivable":"false", "Status":"Initial", "AccountId":"001DS00001M3osoYAB", "CaseId":"500DS00000FURuNYAX"}]';
+    private static testMethod void testSobjectFieldDefaults(){
+        Cognisureapi__mdt cognisureapimetadata = Cognisureapi__mdt.getInstance('api_details');
+        StaticResource fsc_sobject_field_defaults;
+        List<String> sobjectList = new List<String>{'Account','Claim'};
+        if(fsc_sobject_field_defaults ==null){
+            List<StaticResource> srList = [Select Id,name,body from StaticResource where Name = : (String) cognisureapimetadata.get('Field_Default_Definition__c')];
+            if(srList.size()==0){
+                System.assert(false, 'Field Default Definition Static Resource is not found. ');
+            }
+            if(srList.size()>0){
+                fsc_sobject_field_defaults = srList[0];
+            }
+        }
+        Schema.DescribeSObjectResult[] descResult = Schema.describeSObjects(
+                new List<String>(sobjectList));
+        Map<String,Schema.DescribeSObjectResult> descResMap = new Map<String,Schema.DescribeSObjectResult>();
+        for(Schema.DescribeSObjectResult descResult_iter:descResult){
+            descResMap.put(descResult_iter.getName(),descResult_iter);
+        }
+        StaticResource Sr = fsc_sobject_field_defaults;
+        String DefaultfieldMapStr =  EncodingUtil.base64Decode(EncodingUtil.base64Encode(sr.body)).toString();
+
+
+        for(String Sobjectname:sobjectList){
+            Schema.DescribeSObjectResult descSobjRes = descResMap.get(Sobjectname);
+            Map<String,Object> DefaultfieldMapByObject = (Map<String, Object>)JSON.deserializeUntyped(DefaultfieldMapStr);
+            Map<String,Object> DefaultsMap_Sobject = (Map<String,Object>)DefaultfieldMapByObject.get(Sobjectname);
+            if(Sobjectname=='Account'){
+                if(DefaultfieldMapByObject.containsKey('Account')){
+                    Object accountMapObj = DefaultfieldMapByObject.get('Account');
+
+                    Map<String,Object> accountFieldDefaultMap =(Map<String,Object>)accountMapObj;
+                    if(!accountFieldDefaultMap.containsKey('Name')){
+                        System.assert(false,'Account Name Default Does Not Exist. ');
+                    }
+                    else{
+                        String accountName = (String)accountFieldDefaultMap.get('Name');
+                        if(String.isBlank(accountName))
+                            System.assert(false,'Account Name Default Does Not Exist. ');
+
+                    }
+                }
+                else{
+                    System.assert(false,'Account  Default Map Does Not Exist. ');
+
+                }
+            }
+            if(Sobjectname=='Claim'){
+                if(DefaultfieldMapByObject.containsKey('Claim')){
+                    Object claimMapObj = DefaultfieldMapByObject.get('Claim');
+
+                    Map<String,Object> accountFieldDefaultMap =(Map<String,Object>)claimMapObj;
+                    if(!accountFieldDefaultMap.containsKey('Name')){
+                        System.assert(false,'Account Name Default Does Not Exist. ');
+                    }
+                    else{
+                        String accountName = (String)accountFieldDefaultMap.get('Name');
+                        if(String.isBlank(accountName))
+                            System.assert(false,'Account Name Default Does Not Exist. ');
+
+                    }
+                }
+                else{
+                    System.debug(LoggingLevel.DEBUG,JSON.serialize(DefaultsMap_Sobject));
+                    System.assert(false,'Claim  Default Map Does Not Exist. ');
+
+                }
+            }
+        }
+
+
+    }
+
+    private static testMethod void testInsertClaimRecords(){
+        String claimJson = '[{"attributes":{"type":"Claim"},"Name":"Test0", "IsDrivable":"false", "Status":"Initial", "AccountId":"", "CaseId":""}]';
         List<Claim> cliams = (List<Claim>)JSON.deserialize(claimJson,List<Claim>.class);
         Insert cliams;
     }
 
-}
+    private static testMethod void testNameSpaceAPI(){
+        String NAMESPACEPREFIX= 'csundrwrtr__';
+        String caseFieldAPI = NAMESPACEPREFIX+'case__c';
+        Submission__c s = [select Id,csundrwrtr__Case__c from Submission__c limit 1];
+       Schema.DescribeSObjectResult[] descResult = Schema.describeSObjects(new List<String>{'Submission__c'});
+       Schema.DescribeSObjectResult descResult0 = descResult[0];
+       System.debug(LoggingLevel.Debug, descResult0.fields.getMap().get(caseFieldAPI));
+       Schema.SobjectField fieldToken_case = descResult0.fields.getMap().get(caseFieldAPI);
+       System.debug((String)s.get(fieldToken_case));
+       
+       Schema.DescribeSObjectResult dsr = Cognisureapi__mdt.sObjectType.getDescribe();
+       String namespacePrefix0 = dsr.getName().remove(dsr.getLocalName());
+       System.debug(namespacePrefix0);
+    }
 
+    /*public static void processResponseElements(String jsonResponseElement){
+        String jsonResponseElement2 = '{"Insured_Nm": "Carver & Carver Plumbing Inc.","Policy_Effectivedate": "09/12/2019","Policy_Expirydate": "09/12/2020","Policy_Nbr": "40466","Amount":1000,"Amount2":1000.0}';
+        JSONParser parser = JSON.createParser(jsonResponseElement2);
+        while (parser.nextToken() != null) {
+            if (parser.getCurrentToken() == JSONToken.FIELD_NAME) {
+                System.debug(LoggingLevel.DEBUG,parser.getText());
+                parser.nextToken();
+                System.debug(LoggingLevel.DEBUG,parser.getText());
+
+            }
+
+        }
+        // if(version != null && String.isNotEmpty(label)) {
+        //     apiVersionToReleaseNameMap.put(version, label);
+        //     version = null;
+        //     label = null;
+        // }
+
+    }*/
+
+}

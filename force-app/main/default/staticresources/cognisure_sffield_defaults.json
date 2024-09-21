@@ -3,25 +3,13 @@
      "Name":"Cognisure Test Account"
     },
     "Claim" : {
-        "Name":"Cognisure Default",
-        "IsDrivable":false,
-        "Status":"Initial"
+        "Name":"Cognisure Default"
     },
     "CustomerProperty" : {
-        "BedroomCount": 3,
         "BuiltUpArea": "1000",
-        "CeilingType": "Conventional",
-        "DwellingType": "Duplex",
         "FairMarketValue": 100000,
-        "FloorCount": 2,
-        "FloorType": "Ceramic Tile",
-        "FoundationType": "Basement",
-        "GarageType": "Attached",
-        "LotArea": "2000",
-        "PrimaryOwnerId": "001DS00001MTngNYAT",
         "PurchaseDate": "01/07/2024",
         "PurchasePrice": 100000.0,
-        "RoofType": "Slate",
         "YearBuilt": 2000
     },
     
