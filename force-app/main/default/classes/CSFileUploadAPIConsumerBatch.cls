@@ -5,10 +5,10 @@ public class CSFileUploadAPIConsumerBatch implements Database.Batchable<sObject>
     private CognisureAPIConsumerCtrl csapi;
 
     public CSFileUploadAPIConsumerBatch() {
-       // this.query = 'Select Id from case where createdDate = today and Id not in (select case__c from Submission__c)';
-        Sobject  cognisureapimetadata = [Select Id,Email_Message_Query_Plugin__c, Submission_Query_Plugin__c from Cognisureapi__mdt where DeveloperName ='api_details'];
-        string fileuploadQueryPlugin = cognisureapimetadata.get('Email_Message_Query_Plugin__c')!=null?(String)cognisureapimetadata.get('Email_Message_Query_Plugin__c'):'CognisureAPI.MessageQueryBuilder';
-        this.query = ((CognisureAPI.IMessageQueryHandler )Type.forName(fileuploadQueryPlugin).newInstance()).getMessageQuery();
+        // this.query = 'Select Id from case where createdDate = today and Id not in (select case__c from Submission__c)';
+        Sobject cognisureapimetadata = [Select Id, Email_Message_Query_Plugin__c, Submission_Query_Plugin__c from Cognisureapi__mdt where DeveloperName = 'api_details'];
+        string fileuploadQueryPlugin = cognisureapimetadata.get('Email_Message_Query_Plugin__c') != null ? (String) cognisureapimetadata.get('Email_Message_Query_Plugin__c') : 'CognisureAPI.MessageQueryBuilder';
+        this.query = ((CognisureAPI.IMessageQueryHandler) Type.forName(fileuploadQueryPlugin).newInstance()).getMessageQuery();
 
     }
 
@@ -26,7 +26,7 @@ public class CSFileUploadAPIConsumerBatch implements Database.Batchable<sObject>
                 String JSONResp = this.csapi.makeUploadRequestdo(sobjectId);
                 System.debug(LoggingLevel.DEBUG, 'JSONResp:' + JSONResp);
 
-                if(String.isBlank(JSONResp))
+                if (String.isBlank(JSONResp))
                     Throw New CSFileUploadAPIException('Empty Response from Server for File Upload');
 
                 Sobject sobj_Submission = UploadAPIResponseProcessor.processJSONResponse(JSONResp);

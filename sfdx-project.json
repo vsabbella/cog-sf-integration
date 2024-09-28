@@ -3,15 +3,20 @@
     {
       "path": "force-app",
       "default": true,
-      "package": "cs-dig-undrwrtr",
-      "versionName": "ver 0.1",
-      "versionNumber": "0.1.0.NEXT",
-      "versionDescription": "",
-      "dependencies": [
-        {
-          "subscriberPackageVersionId": "04tHn000001Vv4aIAC"
-        }
-      ]
+      "package": "Cognisure AI For Underwriters",
+      "versionName": "ver 0.2",
+      "versionNumber": "0.2.0.NEXT",
+      "ancestorVersion": "0.1.0",
+      "versionDescription": "Fixes to the reported issues."
+    },
+    {
+      "path": "force-app",
+      "package": "Cognisure AI",
+      "versionName": "ver 0.4",
+      "versionNumber": "0.4.0.NEXT",
+      "ancestorVersion": "0.3.0",
+      "default": false,
+      "versionDescription": "Cognisure AI helps with digitizing claims and loss runs from unstructed data like pdf documents "
     }
   ],
   "name": "cognisure-fsc-ext",
@@ -21,6 +26,19 @@
   "packageAliases": {
     "cs-dig-undrwrtr": "0HoHr000000Kzx2KAC",
     "cs-dig-undrwrtr@0.1.0-1": "04tHr0000013If8IAE",
-    "cs-dig-undrwrtr@0.1.0-2": "04tHr0000013IfDIAU"
+    "cs-dig-undrwrtr@0.1.0-2": "04tHr0000013IfDIAU",
+    "Cognisure AI": "0HoHr000000Kzx7KAC",
+    "cs-dig-undrwrtr@0.1.0-3": "04tHr0000013IfIIAU",
+    "Cognisure AI@0.1.0-1": "04tHr0000013IfSIAU",
+    "Cognisure AI@0.1.0-2": "04tHr0000013K4FIAU",
+    "Cognisure AI@0.1.0-3": "04tHr0000013L08IAE",
+    "Cognisure AI@0.1.0-4": "04tHr0000013LT7IAM",
+    "Cognisure AI@0.1.0-5": "04tHr0000013LTCIA2",
+    "Cognisure AI@0.1.0-6": "04tHr0000013MGpIAM",
+    "Cognisure AI@0.1.0-7": "04tHr0000013NbjIAE",
+    "Cognisure AI@0.2.0-1": "04tHr0000013OPMIA2",
+    "Cognisure AI@0.2.0-2": "04tHr0000013OfxIAE",
+    "Cognisure AI@0.2.0-3": "04tHr0000013Og2IAE",
+    "Cognisure AI@0.3.0-2": "04tHr0000013PwoIAE"
   }
 }

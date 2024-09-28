@@ -3,7 +3,7 @@
     <fullName>Record_Field_Setter_Plugin__c</fullName>
     <description>Sets the field values using apex class when processing Cognisure response.</description>
     <externalId>false</externalId>
-    <fieldManageability>DeveloperControlled</fieldManageability>
+    <fieldManageability>SubscriberControlled</fieldManageability>
     <inlineHelpText>Sets the field values using apex class when processing Cognisure response.</inlineHelpText>
     <label>Record Field Setter Plugin</label>
     <length>100</length>
