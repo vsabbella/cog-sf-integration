@@ -2,7 +2,7 @@
  * Created by venkatasabbella on 1/27/24.
  */
 
-global with sharing class CognisureCommonJsonMockImpl implements HttpCalloutMock{
+global with sharing class CognisureCommonJsonMockImpl implements HttpCalloutMock {
     global HTTPResponse respond(HTTPRequest req) {
         // Create a fake response
         HttpResponse res = new HttpResponse();

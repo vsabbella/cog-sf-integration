@@ -7,9 +7,9 @@ public class cssubmissionbatch implements Database.Batchable<sObject>, Database.
     private CognisureAPIConsumerCtrl csapi;
 
     public cssubmissionbatch() {
-        Sobject  cognisureapimetadata = [Select Id,Email_Message_Query_Plugin__c, Submission_Query_Plugin__c from Cognisureapi__mdt where DeveloperName ='api_details'];
-        String submissionqueryplugin= cognisureapimetadata.get('Submission_Query_Plugin__c')!=null?(String)cognisureapimetadata.get('Submission_Query_Plugin__c'):'CognisureAPI.SubmissionQueryBuilder';
-        this.query =  ((CognisureAPI.ISubmissionQueryHandler)Type.forName(submissionqueryplugin).newInstance()).getSubmissionQuery();
+        Sobject cognisureapimetadata = [Select Id, Email_Message_Query_Plugin__c, Submission_Query_Plugin__c from Cognisureapi__mdt where DeveloperName = 'api_details'];
+        String submissionqueryplugin = cognisureapimetadata.get('Submission_Query_Plugin__c') != null ? (String) cognisureapimetadata.get('Submission_Query_Plugin__c') : 'CognisureAPI.SubmissionQueryBuilder';
+        this.query = ((CognisureAPI.ISubmissionQueryHandler) Type.forName(submissionqueryplugin).newInstance()).getSubmissionQuery();
     }
 
     public Database.QueryLocator start(Database.BatchableContext BC) {

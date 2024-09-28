@@ -13,9 +13,9 @@ public class vNHttpFormBuilder {
      *  Pad the value with spaces until the base64 encoding is no longer padded.
      */
     private static string SafelyPad(
-        string value,
-        string valueCrLf64,
-        string lineBreaks) {
+            string value,
+            string valueCrLf64,
+            string lineBreaks) {
         string valueCrLf = '';
         blob valueCrLfBlob = null;
 
@@ -43,7 +43,7 @@ public class vNHttpFormBuilder {
      *  Write a boundary at the end of the form's body.
      */
     public static string WriteBoundary(
-        EndingType ending) {
+            EndingType ending) {
         string value = '';
 
         if (ending == EndingType.Cr) {
@@ -75,10 +75,10 @@ public class vNHttpFormBuilder {
      *  Wirte a file to the form's body.
      */
     public static WriteFileResult WriteFile(
-        string key,
-        string value,
-        string mimeType,
-        blob fileBlob) {
+            string key,
+            string value,
+            string mimeType,
+            blob fileBlob) {
         EndingType ending = EndingType.None;
         string contentDisposition = 'Content-Disposition: form-data; name="' + key + '"; filename="' + value + '"';
         string contentDispositionCrLf = contentDisposition + '\r\n';
@@ -115,8 +115,8 @@ public class vNHttpFormBuilder {
      *  Write a key-value pair to the form's body.
      */
     public static string WriteBodyParameter(
-        string key,
-        string value) {
+            string key,
+            string value) {
         string contentDisposition = 'Content-Disposition: form-data; name="' + key + '"';
         string contentDispositionCrLf = contentDisposition + '\r\n\r\n';
         blob contentDispositionCrLfBlob = blob.valueOf(contentDispositionCrLf);
@@ -139,8 +139,8 @@ public class vNHttpFormBuilder {
         public final EndingType EndingType { get; private set; }
 
         public WriteFileResult(
-            string content,
-            EndingType ending) {
+                string content,
+                EndingType ending) {
             this.Content = content;
             this.EndingType = ending;
         }

@@ -1,0 +1,35 @@
+sf package create --name "Cognisure AI" --description "Cognisure AI helps with digitizing claims and loss runs from unstructed data like pdf documents " --package-type Managed --path force-app --target-dev-hub "cognisure partner"
+
+
+sf package version create --package "Cognisure AI" --wait 30 --installation-key-bypass --code-coverage --definition-file config/project-scratch-def.json --target-dev-hub "cognisure partner"
+
+sf scanner run dfa --format=csv --outfile=CodeAnalyzerDFA.csv --target="./" --projectdir="./" --category="Security"
+
+sf scanner run --engine="pmd-appexchange" --format=csv --outfile=CodeAnalyzerPmdAppExchange.csv --target="./"
+
+
+
+
+
+sf scanner run --format=csv --outfile=CodeAnalyzerGeneral2.csv --target="./" --category="Security"
+
+sf package version promote --package "Package Version Alias"
+
+------
+sf package version list
+sf package install --package "cs-dig-undrwrtr@0.1.0-3" --target-org test-tfc1ioump7ht@example.com
+
+"caseSettings": {
+      "enableEmailToCase": "true",
+      "enableOnDemandEmailToCase": "true",
+      "enableE2CAttachmentAsFile": "true",
+      "enableE2CSourceTracking": "true",
+      "enableThreadTokenInBody": "true",
+      "enableThreadTokenInSubject": "true",
+      "useEmailHeadersForThreading": "true"
+    }
+
+    -------------------------------
+
+    pushing to github
+    git remote add origin https://github.com/CogniSure/SalesForceManagedPackage.git

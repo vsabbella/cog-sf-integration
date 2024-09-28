@@ -4,7 +4,7 @@
     <protected>false</protected>
     <values>
         <field>Base_URL__c</field>
-        <value xsi:type="xsd:string">https://pcqa.cognisure.ai:1099</value>
+        <value xsi:type="xsd:string">https://api.cognisure.ai</value>
     </values>
     <values>
         <field>Common_JSON_URL__c</field>
@@ -15,20 +15,12 @@
         <value xsi:type="xsd:string">CognisureAPI.MessageQueryBuilder</value>
     </values>
     <values>
-        <field>FSC_Object_Response_Map_Definiton__c</field>
-        <value xsi:type="xsd:string">cognisure_Sobject_Mapping</value>
-    </values>
-    <values>
         <field>Field_Default_Definition__c</field>
         <value xsi:type="xsd:string">cognisure_sffield_defaults</value>
     </values>
     <values>
         <field>Field_External_Id_Definition__c</field>
         <value xsi:type="xsd:string">cognisure_Sobject_External_Ids</value>
-    </values>
-    <values>
-        <field>Field_Mapping_Definition__c</field>
-        <value xsi:type="xsd:string">cognisurefieldmap</value>
     </values>
     <values>
         <field>File_Content_Plugin__c</field>

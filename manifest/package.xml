@@ -25,10 +25,8 @@
         <members>Cognisureapi__mdt.Base_URL__c</members>
         <members>Cognisureapi__mdt.Common_JSON_URL__c</members>
         <members>Cognisureapi__mdt.Email_Message_Query_Plugin__c</members>
-        <members>Cognisureapi__mdt.FSC_Object_Response_Map_Definiton__c</members>
         <members>Cognisureapi__mdt.Field_Default_Definition__c</members>
         <members>Cognisureapi__mdt.Field_External_Id_Definition__c</members>
-        <members>Cognisureapi__mdt.Field_Mapping_Definition__c</members>
         <members>Cognisureapi__mdt.NamedCredentail__c</members>
         <members>Cognisureapi__mdt.Objects_To_Create__c</members>
         <members>Cognisureapi__mdt.Password__c</members>
@@ -40,6 +38,7 @@
         <members>Cognisureapi__mdt.Upload_API_Endpoint__c</members>
         <members>Cognisureapi__mdt.Upload_API_Plugin__c</members>
         <members>Cognisureapi__mdt.Username__c</members>
+        <members>Cognisureapi__mdt.File_Content_Plugin__c</members>
         <members>CoverageType.Cognisure_External_Id__c</members>
         <members>CustomerProperty.Building_Number__c</members>
         <members>CustomerProperty.Cognisure_External_Id__c</members>
